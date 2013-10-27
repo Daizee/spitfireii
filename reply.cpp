@@ -35,6 +35,7 @@ std::vector<asio::const_buffer> reply::to_buffers()
   {
 	  amf3writer * writer;
 
+	  //TODO: use boost buffer object instead?
 	  char tbuff[15000];
 	  int length = 0;
 	  writer = new amf3writer(tbuff+4);

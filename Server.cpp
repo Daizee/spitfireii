@@ -545,9 +545,7 @@ void Server::run()
 
 	{
 		Session ses2(serverpool->get());
-		//Statement select(ses2);
-		//select << "SELECT `accounts`.*,`evony`.`account`.`email`,`evony`.`account`.`password` FROM `accounts` LEFT JOIN `evony`.`account` ON (`evony`.`account`.`id`=`accounts`.`parentid`) ORDER BY `accounts`.`accountid` ASC", now;
-		Statement stmt = (ses2 << "SELECT accounts.*,evony.account.email,evony.account.password FROM accounts LEFT JOIN evony.account ON (evony.account.id=accounts.parentid) ORDER BY accounts.accountid ASC;");
+		Statement stmt = (ses2 << "SELECT accounts.*,"+dbmaintable+".account.email,"+dbmaintable+".account.password FROM accounts LEFT JOIN "+dbmaintable+".account ON ("+dbmaintable+".account.id=accounts.parentid) ORDER BY accounts.accountid ASC;");
 		stmt.execute();
 		bool test = stmt.done();
 		RecordSet rs(stmt);
@@ -1113,8 +1111,8 @@ bool Server::ConnectSQL()
 {
 	try
 	{
-		accountpool = new SessionPool("MySQL", "host="+sqlhost+";port=3306;db=evony;user="+sqluser+";password="+sqlpass+";compress=true;auto-reconnect=true");
-		serverpool = new SessionPool("MySQL", "host="+sqlhost+";port=3306;db="+servername+";user="+sqluser+";password="+sqlpass+";compress=true;auto-reconnect=true");
+		accountpool = new SessionPool("MySQL", "host="+sqlhost+";port=3306;db="+dbmaintable+";user="+sqluser+";password="+sqlpass+";compress=true;auto-reconnect=true");
+		serverpool = new SessionPool("MySQL", "host="+sqlhost+";port=3306;db="+dbservertable+";user="+sqluser+";password="+sqlpass+";compress=true;auto-reconnect=true");
 	}
 	catch (Poco::Exception& exc)
 	{

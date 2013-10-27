@@ -7,6 +7,10 @@ Need success response message for expelling alliance member
 Permission checks on alliance subcommands: canceladdUsertoAlliance, setAllianceFriendship, setAllInfoForAlliance, agreeComeinAllianceByLeader, kickOutMemberfromAlliance
 Allow players to accept alliance invites
 Add code to calculate "pay by cents" cost for research and buildings (automatically figures the least expensive speed up items)
+Use SQLite for local data (items, heroes, tiles)
+Timer on closed clients (currently leaves sockets open) to prevent clients never closing them when they should
+Save data - Ideally save as actions are performed to prevent data loss
+Load connecting itemxml from itemxml.xml or sql
 
 
 

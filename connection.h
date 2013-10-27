@@ -1,5 +1,5 @@
 //
-// connection.hpp
+// connection.h
 // Project Spitfire
 //
 // Copyright (c) 2013 Daizee (rensiadz at gmail dot com)
@@ -25,6 +25,8 @@
 
 #ifndef HTTP_CONNECTION_HPP
 #define HTTP_CONNECTION_HPP
+
+#define MAXPACKETSIZE 32768
 
 #include <asio.hpp>
 #include <boost/array.hpp>
@@ -78,7 +80,7 @@ private:
   request_handler& request_handler_;
 
   /// Buffer for incoming data.
-  boost::array<char, 8192*4> buffer_;
+  boost::array<char, MAXPACKETSIZE> buffer_;
 
   /// The incoming request.
   request request_;

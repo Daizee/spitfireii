@@ -88,10 +88,6 @@ void connection::write(const char * data, const int32_t size)
 	{
 		std::cerr << "asio::write_some() exception: " << e.what() << "\n";
 	}
-
-	//	asio::async_write(socket_, asio::buffer(data, size),
-	//		boost::bind(&connection::handle_write, shared_from_this(),
-	//		asio::placeholders::error));
 }
 
 void connection::handle_read_header(const asio::error_code& e,
@@ -103,9 +99,6 @@ void connection::handle_read_header(const asio::error_code& e,
 		{
 			if (!memcmp(buffer_.data(), "<c", 2) || !memcmp(buffer_.data(), "<p", 2))
 			{
-				//char buff[300];
-				//socket_.read_some(asio::buffer(buff));
-				//						printf("%s", buff);
 				asio::async_write(socket_, asio::buffer("<cross-domain-policy><allow-access-from domain=\"*\" to-ports=\"21-60000\" /></cross-domain-policy>\0"),
 					boost::bind(&connection::handle_write, shared_from_this(),
 					asio::placeholders::error));
@@ -139,18 +132,33 @@ void connection::handle_read(const asio::error_code& e,
 	{
 		if (bytes_transferred != size)
 		{
-			this->client_->m_main->consoleLogger->information(Poco::format("Did not receive proper amount of bytes : %d", size));
+			this->client_->m_main->consoleLogger->information(Poco::format("Did not receive proper amount of bytes : rcv: %?d needed: %?d", bytes_transferred, size));
 			server.stop(shared_from_this());
 			return;
 		}
 		//printf("uid("XI64")\n", uid);
 		// read object size
-		if ((size > 8192*4) || (size <= 0))
+		if ((size > MAXPACKETSIZE) || (size <= 0))
 		{
 			//ERROR - object too large - close connection
 			server.stop(shared_from_this());
 			return;
 		}
+
+		//TODO: Decision: have socket read thread handle packets, or push into a queue
+		//socket thread (easy, already done)
+		// PRO: typically instant response times due to it being processed as it comes in
+		// CON: a large request (legit or non) would cause the socket read thread to lag
+		// 
+		//process thread (complex, ideally better)
+		// PRO: can alleviate lag on socket threads and create multiple thread processing queues depending on importance
+		// CON: complexity and large requests would typically land in the same thread (causing even more lag for them) unless
+		//		made even more complex to have multiple threads for large requests
+		//
+		//Option 3: Evony style
+		// -- create a process thread per x amount of sockets
+		// PRO: lag from one client only affects a set amount of players and not the entire server
+		// CON: quite complex. is ultimately the process thread option only for x amount of sockets
 
 		// parse packet
 		request_.size = size;
@@ -176,9 +184,6 @@ void connection::handle_read(const asio::error_code& e,
 				std::cerr << "asio::write_some() exception: " << e.what() << "\n";
 			}
 			reply_.objects.clear();
-			// 			asio::async_write(socket_, reply_.to_buffers(),
-			// 				boost::bind(&connection::handle_write, shared_from_this(),
-			// 				asio::placeholders::error));
 		}
 
 		asio::async_read(socket_, asio::buffer(buffer_, 4), boost::bind(&connection::handle_read_header, shared_from_this(),
