@@ -1,7 +1,7 @@
 
 
 Things to do:
-Pointer-ify amf3 library
+Pointer-ify amf3 library - must be done before a stress test or production release - lib will crawl under heavy load
 Add subsorts to player/alliance sorting
 Need success response message for expelling alliance member
 Permission checks on alliance subcommands: canceladdUsertoAlliance, setAllianceFriendship, setAllInfoForAlliance, agreeComeinAllianceByLeader, kickOutMemberfromAlliance

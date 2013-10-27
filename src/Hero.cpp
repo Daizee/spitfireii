@@ -1,5 +1,5 @@
 //
-// reply.cpp
+// Hero.cpp
 // Project Spitfire
 //
 // Copyright (c) 2013 Daizee (rensiadz at gmail dot com)
@@ -23,30 +23,52 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "stdafx.h"
-#include "reply.h"
-#include <string>
-#include <boost/lexical_cast.hpp>
+#include "includes.h"
+#include "Hero.h"
 
-std::vector<asio::const_buffer> reply::to_buffers()
+
+Hero::Hero()
 {
-  std::vector<asio::const_buffer> buffers;
-  for (std::size_t i = 0; i < objects.size(); ++i)
-  {
-	  amf3writer * writer;
+	m_experience = m_upgradeexp = 0;
+	m_id = 0;
+	m_itemamount = m_itemid = 0;
+	m_level = m_remainpoint = 0;
+	m_stratagem = m_stratagemadded = m_stratagembuffadded = 0;
+	m_power = m_poweradded = m_powerbuffadded = 0;
+	m_management = m_managementadded = m_managementbuffadded = 0;
+	m_status = m_loyalty = 0;
+	m_name = "";
+	m_logourl = "";
+	movement = 0;
+}
 
-	  //TODO: use boost buffer object instead?
-	  char tbuff[15000];
-	  int length = 0;
-	  writer = new amf3writer(tbuff+4);
+Hero::~Hero()
+{
 
-	  writer->Write(objects[i]);
+}
 
-	  (*(int*)tbuff) = length = writer->position;
-	  ByteSwap(*(int*)tbuff);
-
-	  buffers.push_back(asio::buffer(tbuff, length+4));
-	  delete writer;
-  }
-  return buffers;
+amf3object Hero::ToObject()
+{
+	amf3object obj = amf3object();
+	obj["experience"] = m_experience;
+	obj["id"] = m_id;
+	obj["itemAmount"] = m_itemamount;
+	//obj["itemId"] = m_itemid;
+	obj["level"] = m_level;
+	obj["logoUrl"] = m_logourl;
+	obj["loyalty"] = m_loyalty;
+	obj["management"] = m_management;
+	obj["managementAdded"] = m_managementadded;
+	obj["managementBuffAdded"] = m_managementbuffadded;
+	obj["name"] = m_name;
+	obj["power"] = m_power;
+	obj["powerAdded"] = m_poweradded;
+	obj["powerBuffAdded"] = m_powerbuffadded;
+	obj["remainPoint"] = m_remainpoint;
+	obj["status"] = m_status;
+	obj["stratagem"] = m_stratagem;
+	obj["stratagemAdded"] = m_stratagemadded;
+	obj["stratagemBuffAdded"] = m_stratagembuffadded;
+	obj["upgradeExp"] = m_upgradeexp;
+	return obj;
 }

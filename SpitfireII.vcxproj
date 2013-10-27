@@ -180,7 +180,7 @@
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>include\boost_1_53_0;include;include\asio;C:\Helbreath Project\HBLoginsII\bin\poco-1.4.6p1\Data\MySQL\include;C:\Helbreath Project\HBLoginsII\bin\poco-1.4.6p1\Data\SQLite\include;C:\Helbreath Project\HBLoginsII\bin\poco-1.4.6p1\Foundation\include;C:\Helbreath Project\HBLoginsII\bin\poco-1.4.6p1\Data\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_DYN_LINK;WIN32;_CONSOLE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;BOOST_ALL_DYN_LINK;WIN32;_CONSOLE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <BrowseInformation>true</BrowseInformation>
@@ -198,7 +198,7 @@
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>include\boost_1_53_0;include;include\asio;C:\Helbreath Project\HBLoginsII\bin\poco-1.4.6p1\Data\MySQL\include;C:\Helbreath Project\HBLoginsII\bin\poco-1.4.6p1\Data\SQLite\include;C:\Helbreath Project\HBLoginsII\bin\poco-1.4.6p1\Foundation\include;C:\Helbreath Project\HBLoginsII\bin\poco-1.4.6p1\Data\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_DYN_LINK;WIN32;_CONSOLE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;BOOST_ALL_DYN_LINK;WIN32;_CONSOLE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <BrowseInformation>true</BrowseInformation>
@@ -211,46 +211,6 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Alliance.h" />
-    <ClInclude Include="AllianceCore.h" />
-    <ClInclude Include="amf3.h" />
-    <ClInclude Include="City.h" />
-    <ClInclude Include="Client.h" />
-    <ClInclude Include="connection.h" />
-    <ClInclude Include="funcs.h" />
-    <ClInclude Include="Hero.h" />
-    <ClInclude Include="Map.h" />
-    <ClInclude Include="reply.h" />
-    <ClInclude Include="request.h" />
-    <ClInclude Include="request_handler.h" />
-    <ClInclude Include="Server.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="structs.h" />
-    <ClInclude Include="targetver.h" />
-    <ClInclude Include="Tile.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Alliance.cpp" />
-    <ClCompile Include="AllianceCore.cpp" />
-    <ClCompile Include="amf3.cpp" />
-    <ClCompile Include="City.cpp" />
-    <ClCompile Include="Client.cpp" />
-    <ClCompile Include="connection.cpp" />
-    <ClCompile Include="funcs.cpp" />
-    <ClCompile Include="Hero.cpp" />
-    <ClCompile Include="Map.cpp" />
-    <ClCompile Include="reply.cpp" />
-    <ClCompile Include="request_handler.cpp" />
-    <ClCompile Include="Server.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Tile.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -258,6 +218,40 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\config.lua" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Alliance.h" />
+    <ClInclude Include="src\AllianceCore.h" />
+    <ClInclude Include="src\amf3.h" />
+    <ClInclude Include="src\City.h" />
+    <ClInclude Include="src\Client.h" />
+    <ClInclude Include="src\connection.h" />
+    <ClInclude Include="src\funcs.h" />
+    <ClInclude Include="src\Hero.h" />
+    <ClInclude Include="src\Map.h" />
+    <ClInclude Include="src\reply.h" />
+    <ClInclude Include="src\request.h" />
+    <ClInclude Include="src\request_handler.h" />
+    <ClInclude Include="src\Server.h" />
+    <ClInclude Include="src\includes.h" />
+    <ClInclude Include="src\structs.h" />
+    <ClInclude Include="src\Tile.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Alliance.cpp" />
+    <ClCompile Include="src\AllianceCore.cpp" />
+    <ClCompile Include="src\amf3.cpp" />
+    <ClCompile Include="src\City.cpp" />
+    <ClCompile Include="src\Client.cpp" />
+    <ClCompile Include="src\connection.cpp" />
+    <ClCompile Include="src\funcs.cpp" />
+    <ClCompile Include="src\Hero.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Map.cpp" />
+    <ClCompile Include="src\reply.cpp" />
+    <ClCompile Include="src\request_handler.cpp" />
+    <ClCompile Include="src\Server.cpp" />
+    <ClCompile Include="src\Tile.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

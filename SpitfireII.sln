@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpitfireII", "SpitfireII.vcxproj", "{E1527BC3-9A8E-46E4-A2E9-C8D185EC1EB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpitfireIICS", "..\SpitfireIICS\SpitfireIICS.csproj", "{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,22 +40,6 @@ Global
 		{E1527BC3-9A8E-46E4-A2E9-C8D185EC1EB6}.ReleaseDebug|Win32.Build.0 = ReleaseDebug|Win32
 		{E1527BC3-9A8E-46E4-A2E9-C8D185EC1EB6}.ReleaseDebug|x64.ActiveCfg = ReleaseDebug|x64
 		{E1527BC3-9A8E-46E4-A2E9-C8D185EC1EB6}.ReleaseDebug|x64.Build.0 = ReleaseDebug|x64
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.Release|Win32.ActiveCfg = Release|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.Release|x64.ActiveCfg = Release|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.ReleaseDebug|Any CPU.ActiveCfg = Release|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.ReleaseDebug|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.ReleaseDebug|Win32.ActiveCfg = Release|Any CPU
-		{20139CD8-E490-4BA2-9A0D-95AFE66AFF8A}.ReleaseDebug|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

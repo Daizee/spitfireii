@@ -24,7 +24,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "stdafx.h"
+#include "includes.h"
 #include "Alliance.h"
 #include "AllianceCore.h"
 #include "Server.h"

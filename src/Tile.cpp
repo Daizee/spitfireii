@@ -1,5 +1,5 @@
 //
-// Hero.cpp
+// Tile.cpp
 // Project Spitfire
 //
 // Copyright (c) 2013 Daizee (rensiadz at gmail dot com)
@@ -22,53 +22,76 @@
 // COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+#include "includes.h"
+#include "Tile.h"
+#include "Client.h"
+#include "City.h"
+#include "funcs.h"
 
-#include "stdafx.h"
-#include "Hero.h"
 
-
-Hero::Hero()
+Tile::Tile(void)
 {
-	m_experience = m_upgradeexp = 0;
-	m_id = 0;
-	m_itemamount = m_itemid = 0;
-	m_level = m_remainpoint = 0;
-	m_stratagem = m_stratagemadded = m_stratagembuffadded = 0;
-	m_power = m_poweradded = m_powerbuffadded = 0;
-	m_management = m_managementadded = m_managementbuffadded = 0;
-	m_status = m_loyalty = 0;
-	m_name = "";
-	m_logourl = "";
-	movement = 0;
+	m_city = 0;
+	m_castleicon = 0;
+	m_castleid = -1;
+	m_id = -1;
+	m_npc = false;
+	m_ownerid = -1;
+	m_powerlevel = -1;
+	m_state = -1;
+	m_type = FLAT;
+	m_status = -1;
+	m_zoneid = -1;
+	m_level = -1;
+	/*	x = y = -1;*/
 }
 
-Hero::~Hero()
-{
 
+Tile::~Tile(void)
+{
 }
 
-amf3object Hero::ToObject()
+
+amf3object Tile::ToObject()
 {
+	PlayerCity * city = (PlayerCity*)m_city;
 	amf3object obj = amf3object();
-	obj["experience"] = m_experience;
 	obj["id"] = m_id;
-	obj["itemAmount"] = m_itemamount;
-	//obj["itemId"] = m_itemid;
-	obj["level"] = m_level;
-	obj["logoUrl"] = m_logourl;
-	obj["loyalty"] = m_loyalty;
-	obj["management"] = m_management;
-	obj["managementAdded"] = m_managementadded;
-	obj["managementBuffAdded"] = m_managementbuffadded;
-	obj["name"] = m_name;
-	obj["power"] = m_power;
-	obj["powerAdded"] = m_poweradded;
-	obj["powerBuffAdded"] = m_powerbuffadded;
-	obj["remainPoint"] = m_remainpoint;
-	obj["status"] = m_status;
-	obj["stratagem"] = m_stratagem;
-	obj["stratagemAdded"] = m_stratagemadded;
-	obj["stratagemBuffAdded"] = m_stratagembuffadded;
-	obj["upgradeExp"] = m_upgradeexp;
+	obj["name"] = city->m_cityname;
+	obj["npc"] = m_npc;
+	obj["prestige"] = city->m_client->m_prestige;
+	obj["honor"] = city->m_client->m_honor;
+	obj["state"] = city->m_client->m_status;
+	obj["userName"] = city->m_client->m_playername;
+	obj["flag"] = city->m_client->m_flag;
+	obj["allianceName"] = city->m_client->m_alliancename;
 	return obj;
 }
+
+string Tile::GetName()
+{
+	if (m_npc)
+		switch (m_type)
+	{
+		case FOREST:
+			return "Forest";
+		case DESERT:
+			return "Desert";
+		case HILL:
+			return "Hill";
+		case SWAMP:
+			return "Swamp";
+		case GRASS:
+			return "Grass";
+		case LAKE:
+			return "Lake";
+		case FLAT:
+			return "Flat";
+		case CASTLE:
+			return (m_city)?m_city->m_cityname:"Invalid City";
+		case NPC:
+			return "Barbarian's City";
+	}
+}
+
