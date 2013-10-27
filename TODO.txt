@@ -1,0 +1,33 @@
+
+
+Things to do:
+Pointer-ify amf3 library
+Add subsorts to player/alliance sorting
+Need success response message for expelling alliance member
+Permission checks on alliance subcommands: canceladdUsertoAlliance, setAllianceFriendship, setAllInfoForAlliance, agreeComeinAllianceByLeader, kickOutMemberfromAlliance
+Allow players to accept alliance invites
+Add code to calculate "pay by cents" cost for research and buildings (automatically figures the least expensive speed up items)
+
+
+
+Bugs:
+Can apply to the same alliance multiple times
+Alliance members show up as "neutral" on mapInfoSimple
+Gold suddenly jumps to 8 quadrillion randomly? Need to find out how and where
+
+
+
+Features until completion:
+Combat
+Market
+Friends list
+Coord saving
+Mail
+Reports
+Items
+Quests
+Buffs
+Troop healing
+Warehouses
+Reinforcing
+

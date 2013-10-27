@@ -11,3 +11,27 @@
 *.lai
 *.la
 *.a
+
+# Windows
+*.obj
+*.sbr
+*.tlog
+*.log
+*.idb
+*.pdb
+*.lastbuildstate
+*.exe
+*.dll
+*.lib
+*.unsuccessfulbuild
+*.suo
+*.sdf
+*.opensdf
+*.rar
+*.zip
+*.filters
+*.user
+*.map
+*.bsc
+*.xml
+include/
