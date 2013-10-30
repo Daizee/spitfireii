@@ -2433,7 +2433,7 @@ Hero * Server::CreateRandomHero(int innlevel)
 
 	hero->m_loyalty = 70;
 	hero->m_experience = 0;
-	hero->m_upgradeexp = hero->m_level * hero->m_level * 100;
+	hero->m_upgradeexp = hero->m_level * 200 + 100;
 	hero->m_id = 0;
 	char tempstr[30];
 	sprintf(tempstr, "Test Name%d%d%d", hero->m_power, hero->m_management, hero->m_stratagem);
