@@ -6,30 +6,41 @@
 //
 // This file is part of Spitfire.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of
-// this software and associated documentation files (the "Software"), to deal in
-// the Software without restriction, including without limitation the rights to
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-// the Software, and to permit persons to whom the Software is furnished to do so,
-// subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// Spitfire is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// Spitfire is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with Spitfire.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef AMF_H
-#define	AMF_H
+#ifndef AMFLIB_H
+#define	AMFLIB_H
 
+#include <stdarg.h>
+
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <queue>
+#include <map>
+#include <vector>
+#include <list>
 #include <string.h>
+
+#include <memory>
+#include <memory.h>
+
+#include <math.h>
 
 using namespace std;
 
+class amf3object;
 class amf3array;
 class amf3objectmap;
 
@@ -57,33 +68,91 @@ enum Flags
 	Dynamic = 8
 };
 
-template <class T>
+template <typename T>
 class amf3reflist
 {
 public:
-	amf3reflist(void);
-	~amf3reflist(void);
+	amf3reflist(void){};
+	~amf3reflist(void)
+	{
+		properties.clear();
+		propnames.clear();
+	};
 
-	void AddObj(T obj);
-	void AddObj(string key, T obj);
-	T & GetObj(string key);
-	T & GetObj(int offset);
-	int Exists(string key);
+	void AddObj(T obj)
+	{
+		properties.push_back(obj);
+	}
+
+	void AddObj(string key, T obj)
+	{
+		propnames.push_back(key);
+		properties.push_back(obj);
+	}
+
+	T & GetObj(string key)
+	{
+		for (unsigned int i = 0; i < propnames.size(); ++i)
+		{
+			if (propnames[i] == key)
+				return properties.at(i);
+		}
+		throw "Key: " + key + " does not exist in object";
+	}
+
+	T & GetObj(int offset)
+	{
+		return properties.at(offset);
+	}
+
+	int Exists(string key)
+	{
+		for (unsigned int i = 0; i < propnames.size(); ++i)
+		{
+			if (propnames[i] == key)
+				return i;
+		}
+		return -1;
+	}
+
 	vector<string> propnames;
 	vector<T> properties;
 };
+class amf3classdef
+{
+public:
+	amf3classdef(void);
+	amf3classdef(string name, vector<string> & properties, bool dynamic, bool externalizable);
+	amf3classdef(const amf3classdef & classdef);
+	~amf3classdef(void);
 
-//#undef bool
+	string name;
+	bool dynamic;
+	bool externalizable;
+	vector<string> properties;
+	inline bool IsEqual (amf3classdef & obj) const
+	{
+		if (name != obj.name || dynamic != obj.dynamic || externalizable != obj.externalizable || (properties.size() != obj.properties.size()))
+			return false;
+
+		if (properties.size() == obj.properties.size())
+		{
+			for (uint32_t i = 0; i < properties.size(); ++i)
+			{
+				if (properties.at(i) != obj.properties.at(i))
+					return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+		return true;
+	}
+};
 class amf3object
 {
 public:
-	// 	amf3object(void)
-	// 	{
-	// 		amf3encapscreate++;
-	// 		this->type = Undefined;
-	// 		number = 0;
-	// 	}
-
 	~amf3object(void);
 
 	Amf3TypeCode type;
@@ -100,9 +169,9 @@ public:
 		bool booltest;
 		int integer;
 		double number;
-		amf3array * _array;
-		amf3objectmap * _object;
 	} _value;
+	shared_ptr<amf3array> _array;
+	shared_ptr<amf3objectmap> _object;
 
 	const char * c_str()
 	{
@@ -116,7 +185,7 @@ public:
 	amf3object(const int8_t &val);
 	amf3object(const int16_t &val);
 	amf3object(const int32_t &val);
-	//amf3object(const int &val);
+	//amf3object3(const int &val);
 	amf3object(const int64_t &val);
 	amf3object(const uint8_t &val);
 	amf3object(const uint16_t &val);
@@ -132,7 +201,7 @@ public:
 	amf3object & operator=(const int8_t &val);
 	amf3object & operator=(const int16_t &val);
 	amf3object & operator=(const int32_t &val);
-	//amf3object & operator=(const int &val);
+	//amf3object3 & operator=(const int &val);
 	amf3object & operator=(const int64_t &val);
 	amf3object & operator=(const uint8_t &val);
 	amf3object & operator=(const uint16_t &val);
@@ -183,43 +252,6 @@ public:
 	bool operator!=(Amf3TypeCode type);
 
 };
-
-
-class amf3classdef
-{
-public:
-	amf3classdef(void);
-	amf3classdef(string name, vector<string> & properties, bool dynamic, bool externalizable);
-	amf3classdef(const amf3classdef & classdef);
-	~amf3classdef(void);
-
-	string name;
-	bool dynamic;
-	bool externalizable;
-	vector<string> properties;
-	inline bool IsEqual (amf3classdef & obj) const
-	{
-		if (name != obj.name || dynamic != obj.dynamic || externalizable != obj.externalizable || (properties.size() != obj.properties.size()))
-			return false;
-
-		if (properties.size() == obj.properties.size())
-		{
-			for (uint32_t i = 0; i < properties.size(); ++i)
-			{
-				if (properties.at(i) != obj.properties.at(i))
-					return false;
-			}
-		}
-		else
-		{
-			return false;
-		}
-		return true;
-	}
-};
-
-
-
 class amf3parser
 {
 public:
@@ -244,9 +276,6 @@ public:
 	char * stream;
 	int position;
 };
-
-
-
 class amf3writer
 {
 public:
@@ -299,8 +328,6 @@ public:
 	char * stream;
 	int position;
 };
-
-
 class amf3objectmap
 {
 public:
@@ -396,5 +423,5 @@ public:
 	char type;
 };
 
-#endif	/* AMF_H */
+#endif	/* AMFLIB_H */
 

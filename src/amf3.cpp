@@ -6,108 +6,29 @@
 //
 // This file is part of Spitfire.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of
-// this software and associated documentation files (the "Software"), to deal in
-// the Software without restriction, including without limitation the rights to
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-// the Software, and to permit persons to whom the Software is furnished to do so,
-// subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// Spitfire is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// Spitfire is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with Spitfire.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "includes.h"
-
-#include "amf3.h"
 #include "funcs.h"
 
+#include "amf3.h"
 
-
-int amf3arraycreate;
-int amf3classdefcreate;
-int amf3encapscreate;
-int amf3objectcreate;
-int amf3reflistcreate;
-
-//#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-//#define new DEBUG_NEW
-
-template <class T>
-amf3reflist<T>::amf3reflist(void)
-{
-	//amf3reflistcreate++;
-}
-
-
-template <class T>
-amf3reflist<T>::~amf3reflist(void)
-{
-	//amf3reflistcreate--;
-	if (propnames.size() > 0)
-	{
-//		for (uint32_t i = 0; i < propnames.size(); ++i)
-//			delete[] (char*)propnames.at(i);
-	}
-	properties.clear();
-	propnames.clear();
-}
-
-template <class T>
-void amf3reflist<T>::AddObj(T obj)
-{
-	properties.push_back(obj);
-}
-
-template <class T>
-void amf3reflist<T>::AddObj(string key, T obj)
-{
-//	int len = strlen(key);
-//	char * pkey = new char[len+1];
-//	memset(pkey, 0, len+1);
-//	memcpy(pkey, key, len);
-	propnames.push_back(key);
-	properties.push_back(obj);
-}
-
-template <class T>
-T & amf3reflist<T>::GetObj(string key)
-{
-	//vector<char *>::const_iterator iter;
-	//iter = propnames.begin();
-	for (unsigned int i = 0; i < propnames.size(); /*++iter,*/ ++i)
-	{
-		if (propnames[i] == key)
-			return properties.at(i);
-	}
-	//return (T)0;
-}
-
-template <class T>
-T & amf3reflist<T>::GetObj(int offset)
-{
-	return properties.at(offset);
-}
-
-template <class T>
-int amf3reflist<T>::Exists(string key)
-{
-	//vector<char *>::const_iterator iter;
-	//iter = propnames.begin();
-	for (unsigned int i = 0; i < propnames.size(); /*++iter,*/ ++i)
-	{
-		if (propnames[i] == key)
-			return i;
-	}
-	return -1;
-}
-
+int amf3arraycreate3;
+int amf3classdefcreate3;
+int amf3encapscreate3;
+int amf3objectcreate3;
+int amf3reflistcreate3;
 
 amf3classdef::amf3classdef(void)
 {
@@ -115,10 +36,11 @@ amf3classdef::amf3classdef(void)
 	properties.clear();
 	dynamic = true;
 	externalizable = false;
+	amf3classdefcreate3++;
 }
 amf3classdef::amf3classdef(string name, vector<string> & properties, bool dynamic, bool externalizable)
 {
-	//		amf3classdefcreate++;
+	amf3classdefcreate3++;
 	this->name = name;
 	this->properties = properties;
 	this->dynamic = dynamic;
@@ -126,6 +48,7 @@ amf3classdef::amf3classdef(string name, vector<string> & properties, bool dynami
 }
 amf3classdef::amf3classdef(const amf3classdef & classdef)
 {
+	amf3classdefcreate3++;
 	this->name = classdef.name;
 	if (classdef.properties.size() > 0)
 	{
@@ -139,94 +62,18 @@ amf3classdef::amf3classdef(const amf3classdef & classdef)
 }
 amf3classdef::~amf3classdef(void)
 {
-	//		amf3classdefcreate--;
-	//delete properties;
-//	if (name)
-//		delete[] name;
-	//name.clear();
+	amf3classdefcreate3--;
 }
 
 amf3object::amf3object() {
+	amf3encapscreate3++;
 	type = Null;
 	memset(&_value, 0, sizeof (_value));
 }
 
 amf3object::amf3object(const amf3object &val) {
+	amf3encapscreate3++;
 	InternalCopy(val);
-}
-
-amf3object::amf3object(const bool &val) {
-	memset(&_value, 0, sizeof (_value));
-	if (val)
-	{
-		type = True;
-		_value.booltest = true;
-	}
-	else
-	{
-		type = False;
-		_value.booltest = false;
-	}
-}
-
-amf3object::amf3object(const int8_t &val) {
-	type = Integer;
-	memset(&_value, 0, sizeof (_value));
-	_value.integer = val;
-}
-
-amf3object::amf3object(const int16_t &val) {
-	type = Integer;
-	memset(&_value, 0, sizeof (_value));
-	_value.integer = val;
-}
-
-amf3object::amf3object(const int32_t &val) {
-	type = Integer;
-	memset(&_value, 0, sizeof (_value));
-	_value.integer = val;
-}
-// 
-// amf3object::amf3object(const int &val) {
-// 	type = Integer;
-// 	memset(&_value, 0, sizeof (_value));
-// 	_value.integer = val;
-// }
-
-amf3object::amf3object(const int64_t &val) {
-	type = Number;
-	memset(&_value, 0, sizeof (_value));
-	_value.number = (double)val;
-}
-
-amf3object::amf3object(const uint8_t &val) {
-	type = Integer;
-	memset(&_value, 0, sizeof (_value));
-	_value.integer = val;
-}
-
-amf3object::amf3object(const uint16_t &val) {
-	type = Integer;
-	memset(&_value, 0, sizeof (_value));
-	_value.integer = val;
-}
-
-amf3object::amf3object(const uint32_t &val) {
-	type = Integer;
-	memset(&_value, 0, sizeof (_value));
-	_value.integer = val;
-}
-
-amf3object::amf3object(const uint64_t &val) {
-	type = Number;
-	memset(&_value, 0, sizeof (_value));
-	_value.number = (double)val;
-}
-
-amf3object::amf3object(const double &val) {
-	type = Number;
-	memset(&_value, 0, sizeof (_value));
-	_value.number = val;
 }
 
 void amf3object::InternalCopy(const amf3object &val) {
@@ -245,12 +92,12 @@ void amf3object::InternalCopy(const amf3object &val) {
 		}
 	case Array:
 		{
-			_value._array = new amf3array(*val._value._array);
+			_array = val._array;
 			break;
 		}
 	case Object:
 		{
-			_value._object = new amf3objectmap(*val._value._object);
+			_object = val._object;
 			break;
 		}
 	default:
@@ -260,11 +107,11 @@ void amf3object::InternalCopy(const amf3object &val) {
 		}
 	}
 }
-
 void amf3object::InternalCopy(const amf3array &val) {
 	type = Array;
 	memset(&_value, 0, sizeof (_value));
-	_value._array = new amf3array(val);
+	_array = shared_ptr<amf3array>(new amf3array(val));
+	//_value._array = new amf3array3(val);
 }
 
 void amf3object::Reset(bool isUndefined) {
@@ -276,12 +123,12 @@ void amf3object::Reset(bool isUndefined) {
 		}
 	case Array:
 		{
-			delete _value._array;
+			_array.reset();
 			break;
 		}
 	case Object:
 		{
-			delete _value._object;
+			_object.reset();
 			break;
 		}
 	default:
@@ -296,6 +143,103 @@ void amf3object::Reset(bool isUndefined) {
 	memset(&_value, 0, sizeof (_value));
 }
 
+amf3object::~amf3object(void)
+{
+	amf3encapscreate3--;
+
+	Reset();
+	return;
+}
+
+#define OPERATOR_DEF(ctype) \
+	amf3object::operator ctype() {\
+	switch (type) {\
+	case Null:\
+	case Undefined:\
+{\
+	return 0;\
+}\
+	case True:\
+	case False:\
+{\
+	return (ctype) _value.booltest;\
+}\
+	case Integer:\
+{\
+	return (ctype) _value.integer;\
+}\
+	case Number:\
+{\
+	return (ctype) _value.number;\
+}\
+	default:\
+{\
+	return 0;\
+}\
+}\
+}
+
+OPERATOR_DEF(int8_t);
+OPERATOR_DEF(int16_t);
+OPERATOR_DEF(int32_t);
+//OPERATOR_DEF(int);
+OPERATOR_DEF(int64_t);
+OPERATOR_DEF(uint8_t);
+OPERATOR_DEF(uint16_t);
+OPERATOR_DEF(uint32_t);
+OPERATOR_DEF(uint64_t);
+OPERATOR_DEF(double);
+
+#define CONSTRUCTORINTEGER_DEF(ctype) \
+	amf3object::amf3object(const ctype &val) {\
+	amf3objectcreate3++;\
+	type = Integer;\
+	memset(&_value, 0, sizeof (_value));\
+	_value.integer = val;\
+}
+#define CONSTRUCTORNUMBER_DEF(ctype) \
+	amf3object::amf3object(const ctype &val) {\
+	amf3objectcreate3++;\
+	type = Number;\
+	memset(&_value, 0, sizeof (_value));\
+	_value.number = val;\
+}
+
+#define OPERATORSETINTEGER_DEF(ctype) \
+	amf3object& amf3object::operator=(const ctype &val) {\
+	Reset();\
+	type = Integer;\
+	_value.integer = val;\
+	return *this;\
+}
+#define OPERATORSETNUMBER_DEF(ctype) \
+	amf3object& amf3object::operator=(const ctype &val) {\
+	Reset();\
+	type = Number;\
+	_value.number = val;\
+	return *this;\
+}
+
+CONSTRUCTORINTEGER_DEF(int8_t);
+CONSTRUCTORINTEGER_DEF(int16_t);
+CONSTRUCTORINTEGER_DEF(int32_t);
+CONSTRUCTORNUMBER_DEF(int64_t);
+CONSTRUCTORINTEGER_DEF(uint8_t);
+CONSTRUCTORINTEGER_DEF(uint16_t);
+CONSTRUCTORINTEGER_DEF(uint32_t);
+CONSTRUCTORNUMBER_DEF(uint64_t);
+CONSTRUCTORNUMBER_DEF(double);
+
+OPERATORSETINTEGER_DEF(int8_t);
+OPERATORSETINTEGER_DEF(int16_t);
+OPERATORSETINTEGER_DEF(int32_t);
+OPERATORSETNUMBER_DEF(int64_t);
+OPERATORSETINTEGER_DEF(uint8_t);
+OPERATORSETINTEGER_DEF(uint16_t);
+OPERATORSETINTEGER_DEF(uint32_t);
+OPERATORSETNUMBER_DEF(uint64_t);
+OPERATORSETNUMBER_DEF(double);
+
 amf3object& amf3object::operator=(const amf3object &val) {
 	Reset();
 	InternalCopy(val);
@@ -308,8 +252,9 @@ amf3object& amf3object::operator=(const amf3array &val) {
 	return *this;
 }
 
-amf3object& amf3object::operator=(const bool &val) {
-	Reset();
+amf3object::amf3object(const bool &val) {
+	amf3objectcreate3++;
+	memset(&_value, 0, sizeof (_value));
 	if (val)
 	{
 		type = True;
@@ -320,81 +265,7 @@ amf3object& amf3object::operator=(const bool &val) {
 		type = False;
 		_value.booltest = false;
 	}
-	return *this;
 }
-
-amf3object& amf3object::operator=(const int8_t &val) {
-	Reset();
-	type = Integer;
-	_value.integer = val;
-	return *this;
-}
-
-amf3object& amf3object::operator=(const int16_t &val) {
-	Reset();
-	type = Integer;
-	_value.integer = val;
-	return *this;
-}
-
-amf3object& amf3object::operator=(const int32_t &val) {
-	Reset();
-	type = Integer;
-	_value.integer = val;
-	return *this;
-}
-
-amf3object& amf3object::operator=(const int64_t &val) {
-	Reset();
-	type = Number;
-	_value.number = (double)val;
-	return *this;
-}
-
-amf3object& amf3object::operator=(const uint8_t &val) {
-	Reset();
-	type = Integer;
-	_value.integer = val;
-	return *this;
-}
-
-amf3object& amf3object::operator=(const uint16_t &val) {
-	Reset();
-	type = Integer;
-	_value.integer = val;
-	return *this;
-}
-
-amf3object& amf3object::operator=(const uint32_t &val) {
-	Reset();
-	type = Integer;
-	_value.integer = val;
-	return *this;
-}
-
-amf3object& amf3object::operator=(const uint64_t &val) {
-	Reset();
-	type = Number;
-	_value.number = (double)val;
-	return *this;
-}
-
-amf3object& amf3object::operator=(const double &val) {
-	Reset();
-	type = Number;
-	_value.number = val;
-	return *this;
-}
-
-// amf3object& amf3object::operator=(const Timestamp &val) {
-// 	Reset();
-// 	_type = V_TIMESTAMP;
-// 	DYNAMIC_ALLOC("_value.t");
-// 	_value.t = new Timestamp;
-// 	*_value.t = val;
-// 	NormalizeTs();
-// 	return *this;
-// }
 
 amf3object& amf3object::operator=(const char *pVal) {
 	Reset();
@@ -440,125 +311,6 @@ amf3object::operator bool() {
 		}
 	}
 }
-
-#define OPERATOR_DEF(ctype) \
-	amf3object::operator ctype() {\
-	switch (type) {\
-	case Null:\
-	case Undefined:\
-{\
-	return 0;\
-}\
-	case True:\
-	case False:\
-{\
-	return (ctype) _value.booltest;\
-}\
-	case Integer:\
-{\
-	return (ctype) _value.integer;\
-}\
-	case Number:\
-{\
-	return (ctype) _value.number;\
-}\
-	default:\
-{\
-	return 0;\
-}\
-}\
-}
-
-OPERATOR_DEF(int8_t);
-OPERATOR_DEF(int16_t);
-OPERATOR_DEF(int32_t);
-//OPERATOR_DEF(int);
-OPERATOR_DEF(int64_t);
-OPERATOR_DEF(uint8_t);
-OPERATOR_DEF(uint16_t);
-OPERATOR_DEF(uint32_t);
-OPERATOR_DEF(uint64_t);
-OPERATOR_DEF(double);
-//OPERATOR_DEF(std::string);
-
-/*
-amf3object::operator string() {
-	string s;
-	switch (type) {
-	case Null:
-	case Undefined:
-		{
-			return "";
-		}
-	case True:
-	case False:
-		{
-			s = _value.booltest;
-			return s;
-		}
-	case Integer:
-		{
-			s = _value.integer;
-			return s;
-		}
-	case Number:
-		{
-			s = _value.number;
-			return s;
-		}
-	case Date:
-		{
-			return (string)date;
-		}
-	case String:
-		{
-			return (string)text;
-		}
-	default:
-		{
-			return (string)"";
-		}
-	}
-}*/
-
-// amf3object::operator string()
-// {
-// 	switch (type) {
-// 	case False:
-// 	case True:
-// 		{
-// 			return (_value.booltest ? "true" : "false");
-// 		}
-// 	case Integer:
-// 		{
-// 			char * str;
-// 			string s;
-// 			asprintf(&str, "%d", this->operator int32_t()), s.append(str), free(str);
-// 			return s;
-// 		}
-// 	case Number:
-// 		{
-// 			char * str;
-// 			string s;
-// 			asprintf(&str, "%.3f", this->operator double()), s.append(str), free(str);
-// 			return s;
-// 		}
-// 	case String:
-// 		{
-// 			return text;
-// 		}
-// 	case Null:
-// 	case Undefined:
-// 	case Object:
-// 	case Array:
-// 	default:
-// 		{
-// 			//ASSERT("Cast to string failed: %s", STR(ToString()));
-// 			return "";
-// 		}
-// 	}
-// 	return "";
-// }
 amf3object::operator char*()
 {
 	switch (type) {
@@ -612,109 +364,12 @@ amf3object::operator amf3array*()
 	case Object:
 		return 0;
 	case Array:
-		return _value._array;
+		return _array.get();
 	default:
-			return 0;
+		return 0;
 	}
 	return 0;
 }
-
-// amf3object::operator Timestamp() {
-// 	if (_type == V_DATE ||
-// 		_type == V_TIME ||
-// 		_type == V_TIMESTAMP) {
-// 			return *_value.t;
-// 	} else {
-// 		ASSERT("Cast to struct tm failed: %s", STR(ToString()));
-// 		Timestamp temp = {0};
-// 		return temp;
-// 	}
-// }
-
-// amf3object::operator string() {
-// 	switch (type) {
-// 	case V_BOOL:
-// 		{
-// 			return _value.b ? "true" : "false";
-// 		}
-// 	case V_INT8:
-// 	case V_INT16:
-// 	case V_INT32:
-// 		{
-// 			return format("%d", this->operator int32_t());
-// 		}
-// 	case V_INT64:
-// 		{
-// 			return format("%lld", this->operator int64_t());
-// 		}
-// 	case V_UINT8:
-// 	case V_UINT16:
-// 	case V_UINT32:
-// 		{
-// 			return format("%u", this->operator uint32_t());
-// 		}
-// 	case V_UINT64:
-// 		{
-// 			return format("%llu", this->operator uint64_t());
-// 		}
-// 	case V_DOUBLE:
-// 		{
-// 			return format("%.3f", this->operator double());
-// 		}
-// 	case V_TIMESTAMP:
-// 		{
-// 			char tempBuff[24] = {0};
-// 			return string(tempBuff, strftime(tempBuff, 24, "%Y-%m-%dT%H:%M:%S.000", _value.t));
-// 		}
-// 	case V_DATE:
-// 		{
-// 			char tempBuff[24] = {0};
-// 			return string(tempBuff, strftime(tempBuff, 24, "%Y-%m-%d", _value.t));
-// 		}
-// 	case V_TIME:
-// 		{
-// 			char tempBuff[24] = {0};
-// 			return string(tempBuff, strftime(tempBuff, 24, "%H:%M:%S.000", _value.t));
-// 		}
-// 	case V_BYTEARRAY:
-// 	case V_STRING:
-// 		{
-// 			return *_value.s;
-// 		}
-// 	case V_NULL:
-// 	case V_UNDEFINED:
-// 	case V_TYPED_MAP:
-// 	case V_MAP:
-// 	default:
-// 		{
-// 			ASSERT("Cast to string failed: %s", STR(ToString()));
-// 			return "";
-// 		}
-// 	}
-// 	return "";
-// }
-
-// amf3object& amf3object::operator[](const string &key) {
-// 	if ((_type != V_TYPED_MAP) &&
-// 		(_type != V_MAP) &&
-// 		(_type != V_NULL) &&
-// 		(_type != V_UNDEFINED)) {
-// 			ASSERT("Subscript operator applied on a incorrect Variant type: %s",
-// 				STR(ToString()));
-// 	}
-// 	if ((_type == V_NULL) || (_type == V_UNDEFINED)) {
-// 		_type = V_MAP;
-// 		DYNAMIC_ALLOC("_value.m");
-// 		_value.m = new VariantMap;
-// 	}
-// 	if (!MAP_HAS1(_value.m->children, key)) {
-// 		if (MAP_HAS1(_value.m->children, string(AMF3_TRAITS))) {
-// 			return _value.m->children[AMF3_TRAITS][key];
-// 		}
-// 		_value.m->children[key] = Variant();
-// 	}
-// 	return _value.m->children[key];
-// }
 
 amf3object& amf3object::operator[](const char *key) {
 	if ((type != Object) &&
@@ -722,27 +377,17 @@ amf3object& amf3object::operator[](const char *key) {
 		(type != Null) &&
 		(type != Undefined)) {
 			//ASSERT("Subscript operator applied on a incorrect Variant type: %s",
-				//STR(ToString()));
+			//STR(ToString()));
 	}
 	if ((type == Null) || (type == Undefined)) {
 		type = Object;
-		//DYNAMIC_ALLOC("_value.m");
-		_value._object = new amf3objectmap;
+		_object = shared_ptr<amf3objectmap>(new amf3objectmap);
 	}
-	if (_value._object->Exists((char *)key) < 0)
+	if (_object->Exists((char *)key) < 0)
 	{
-		amf3object temp = amf3object();
-		_value._object->Add((char *)key, temp);
+		_object->Add((char *)key, amf3object());
 	}
-	return (_value._object->Get((char *)key));
-// 	if (!MAP_HAS1(_value.m->children, key)) {
-// 		if (MAP_HAS1(_value.m->children, string(AMF3_TRAITS))) {
-// 			return _value.m->children[AMF3_TRAITS][key];
-// 		}
-// 		_value._object->Add((char *)key, new amf3object());
-// 	}
-	//return _value.m->children[key];
-	//return operator[](string(key));
+	return (_object->Get((char *)key));
 }
 
 amf3object& amf3object::operator[](const double &key) {
@@ -758,77 +403,25 @@ amf3object& amf3object::operator[](const uint32_t &key) {
 			//STR(ToString()));
 	}
 	if ((type == Null) || (type == Undefined)) {
-		type = Array;
-		//DYNAMIC_ALLOC("_value.m");
-		_value._array = new amf3array;
+		throw "Object not an array yet accessed like one";
+
+		//type = Array;
+		//_value._array = new amf3array3;
 	}
-	if (!_value._array->Get(key))
+	if (!_array->Get(key))
 	{
-		amf3object temp = amf3object();
-		_value._array->Add(temp);
+		throw "Index out of array bounds";
+		//amf3object3 temp = amf3object3();
+		//_value._array->Add(temp);
 	}
-	return (_value._array->Get(key));
+	return (_array->Get(key));
 }
 
 amf3object& amf3object::operator[](const int &key) {
 	return operator[]((uint32_t)key);
 }
 
-// amf3object& amf3object::operator[](amf3object &key) {
-// 	stringstream ss;
-// 	switch (key._type) {
-// 	case V_BOOL:
-// 	case V_INT8:
-// 	case V_INT16:
-// 	case V_INT32:
-// 	case V_INT64:
-// 	case V_UINT8:
-// 	case V_UINT16:
-// 	case V_UINT32:
-// 	case V_UINT64:
-// 	case V_DOUBLE:
-// 	case V_TIMESTAMP:
-// 	case V_DATE:
-// 	case V_TIME:
-// 		{
-// 			ss << "__index__value__" << STR(key);
-// 			break;
-// 		}
-// 	case V_STRING:
-// 		{
-// 			ss << *key._value.s;
-// 			break;
-// 		}
-// 	case V_NULL:
-// 	case V_UNDEFINED:
-// 	case V_TYPED_MAP:
-// 	case V_MAP:
-// 	default:
-// 		{
-// 			ASSERT("Variant has invalid type to be used as an index: %s", STR(key.ToString()));
-// 			break;
-// 		}
-// 	}
-// 	return operator[](ss.str());
-// }
-
-// amf3object &amf3object::GetValue(string key, bool caseSensitive) {
-// 	if (caseSensitive) {
-// 		return (*this)[key];
-// 	} else {
-// 
-// 		FOR_MAP(*this, string, Variant, i) {
-// 			if (lowercase(MAP_KEY(i)) == lowercase(key))
-// 				return MAP_VAL(i);
-// 		}
-// 
-// 		return (*this)[key];
-// 	}
-// }
-
 bool amf3object::operator==(amf3object variant) {
-	//return ToString() == variant.ToString();
-
 	if (type == Integer)
 	{
 		return this->_value.integer == variant._value.integer;
@@ -856,8 +449,6 @@ bool amf3object::operator==(amf3object variant) {
 }
 
 bool amf3object::operator==(const char * str) {
-	//return ToString() == variant.ToString();
-
 	if (type == Integer)
 	{
 		return false;
@@ -904,43 +495,109 @@ bool amf3object::operator!=(Amf3TypeCode type) {
 	return !operator ==(type);
 }
 
-amf3object::~amf3object(void)
+amf3objectmap::~amf3objectmap(void)
 {
-	amf3encapscreate--;
-
-	Reset();
-	return;
-
-	switch (type)
-	{
-	case 0:
-	case 1:
-		return;
-	case 2:
-	case 3:
-	case 4:
-	case 5:
-		return;
-	case 6:
-		//delete[] this->text;
-		return;
-	case 7:
-		return;
-	case 8:
-		//delete[] this->date;
-		return;
-	case 9:
-		delete this->_value._array;
-		return;
-	case 10:
-		delete this->_value._object;
-		return;
-	case 11:
-	case 12:
-		return;
-	}
+	amf3objectcreate3--;
 }
 
+amf3object & amf3objectmap::Get(string key)
+{
+	return properties.GetObj(key);
+}
+void amf3objectmap::Add(string key, amf3object & obj)
+{
+	properties.AddObj(key, obj);
+}
+int amf3objectmap::Exists(string key)
+{
+	return properties.Exists(key);
+}
+
+amf3array::amf3array(void)
+{
+	amf3arraycreate3++;
+	this->type = 1;
+}
+
+
+amf3array::~amf3array(void)
+{
+	amf3arraycreate3--;
+}
+
+void amf3array::Add(amf3object & obj)
+{
+	this->type = 1;
+	dense.push_back(obj);
+}
+
+
+void amf3array::Add(string key, amf3object & obj)
+{
+	this->type = 2;
+	associative.AddObj(key, obj);
+	dense.push_back(obj);
+}
+
+
+amf3object & amf3array::Get(int id)
+{
+	return dense.at(id);
+}
+
+
+amf3object & amf3array::Get(string key)
+{
+	return associative.GetObj(key);
+}
+
+
+inline bool amf3object::IsEqual (amf3object & obj, amf3object & obj2)
+{
+	if (obj2.type != obj.type)
+		return false;
+	switch (obj2.type)
+	{
+	case 2:
+		if (obj._value.booltest == false)
+			return true;
+		break;
+	case 3:
+		if (obj._value.booltest == true)
+			return true;
+		break;
+	case 4:
+		if (obj._value.integer == obj2._value.integer)
+			return true;
+		break;
+	case 5:
+		if (obj._value.number == obj2._value.number)
+			return true;
+		break;
+	case 6:
+		if (obj.text == obj2.text)
+			return true;
+		break;
+	case 7:
+		return false;
+	case 8:
+		if (obj.date == obj2.date)
+			return true;
+		break;
+	case 9:
+		if (obj2._array->IsEqual(obj._array.get()))
+			return true;
+		break;
+	case 10:
+		if (obj2._object->IsEqual(obj._object.get()))
+			return true;
+		break;
+	case 11:
+	case 12:
+		return false;
+	}
+	return false;
+}
 
 
 
@@ -955,33 +612,33 @@ amf3parser::amf3parser(char * stream)
 
 amf3parser::~amf3parser(void)
 {
- 	for (int i = 0; i < strlist.properties.size(); ++i)
- 	{
-// 		delete[] (char*)strlist.properties.at(i);
- 	}
+	for (int i = 0; i < strlist.properties.size(); ++i)
+	{
+		// 		delete[] (char*)strlist.properties.at(i);
+	}
 	//internalstrlist.properties.clear();
 	//internalstrlist.propnames.clear();
 
 	//strlist.properties.clear();
 	//strlist.propnames.clear();
 
-// 	int asdf = encapslist.properties.size();
-// 	vector<amf3object *>::const_iterator iter;
-// 	iter = encapslist.properties.begin();
-// 	for (unsigned int i = 0; i < asdf; ++iter, ++i)
-// 		delete (amf3object*)*iter;
+	// 	int asdf = encapslist.properties.size();
+	// 	vector<amf3object *>::const_iterator iter;
+	// 	iter = encapslist.properties.begin();
+	// 	for (unsigned int i = 0; i < asdf; ++iter, ++i)
+	// 		delete (amf3object*)*iter;
 
-//	for (int i = 0; i < encapslist.properties.size(); ++i)
-//	{
-//		//if ((*(amf3encaps*)encapslist.properties.at(i)).type != Object && (*(amf3encaps*)encapslist.properties.at(i)).type != Array)
-//			delete (amf3encaps*)encapslist.properties.at(i);
-//	}
+	//	for (int i = 0; i < encapslist.properties.size(); ++i)
+	//	{
+	//		//if ((*(amf3encaps*)encapslist.properties.at(i)).type != Object && (*(amf3encaps*)encapslist.properties.at(i)).type != Array)
+	//			delete (amf3encaps*)encapslist.properties.at(i);
+	//	}
 	//encapslist.properties.clear();
 	//encapslist.propnames.clear();
-//	for (int i = 0; i < objectlist.properties.size(); ++i)
-//	{
-//		delete objectlist.properties.at(i);
-//	}
+	//	for (int i = 0; i < objectlist.properties.size(); ++i)
+	//	{
+	//		delete objectlist.properties.at(i);
+	//	}
 	//objectlist.properties.clear();
 	//objectlist.propnames.clear();
 	for (int i = 0; i < deflist.properties.size(); ++i)
@@ -993,20 +650,15 @@ amf3parser::~amf3parser(void)
 }
 
 
-amf3object  amf3parser::ReadNextObject(void)
+amf3object amf3parser::ReadNextObject(void)
 {
 	int b = this->stream[position++];
 
-	//	if (b == 65)
-	//		b = this->stream[--position - 1];
 	Amf3TypeCode type = (Amf3TypeCode)b;
 
 	amf3object obj = amf3object();
-	//memset(obj, 0, sizeof(amf3object));
-	int res;
 
 	obj.type = type;
-	//writetype(type);
 
 	char * pstr = 0;
 	int len = 0;
@@ -1037,16 +689,16 @@ amf3object  amf3parser::ReadNextObject(void)
 		obj.date = ReadDate();
 		return obj;
 	case Array:
-		obj._value._array = ReadArray();
+		obj._array = shared_ptr<amf3array>(ReadArray());
 		return obj;
 	case Object:
-		obj._value._object = ReadAMF3Object();
+		obj._object = shared_ptr<amf3objectmap>(ReadAMF3Object());
 		return obj;
-	//default:
+		//default:
 		//Log("Invalid object type (%d)", type);
 		//delete obj;
 	}
-	return amf3object();
+	return 0;
 
 }
 
@@ -1081,21 +733,13 @@ int amf3parser::ReadInteger(void)
 
 	return (int)integer;
 }
-void a_swap(char * a, char * b)
-{
-	register char c, d;
-	c = *a;
-	d = *b;
-	*b = c;
-	*a = d;
-}
 double amf3parser::ReadNumber(void)
 {
 	int integer = 0;
 	int seen = 0;
 	int b = 0;
 
-	char num[8];
+	unsigned char num[8];
 
 	num[0] = stream[position++];
 	num[1] = stream[position++];
@@ -1196,7 +840,7 @@ amf3objectmap * amf3parser::ReadAMF3Object(void)
 
 	if ((flags & Inline) == 0)
 	{
-		return objectlist.GetObj(((int)flags)>>1)._value._object;
+		return objectlist.GetObj(((int)flags)>>1)._object.get();
 	}
 
 	amf3classdef classdef;
@@ -1301,24 +945,6 @@ amf3writer::amf3writer(char * stream)
 
 amf3writer::~amf3writer(void)
 {
-// 	for (int i = 0; i < strlist.properties.size(); ++i)
-// 	{
-// 		delete[] (char*)strlist.properties.at(i);
-// 	}
-// 	strlist.properties.clear();
-// 	strlist.propnames.clear();
-	for (int i = 0; i < encapslist.properties.size(); ++i)
-	{
-//		delete (amf3object*)encapslist.properties.at(i);
-	}
-// 	encapslist.properties.clear();
-// 	encapslist.propnames.clear();
-	for (int i = 0; i < deflist.properties.size(); ++i)
-	{
-//		delete (amf3classdef*)deflist.properties.at(i);
-	}
-// 	deflist.properties.clear();
-// 	deflist.propnames.clear();
 }
 
 void amf3writer::Write(Amf3TypeCode type)
@@ -1366,12 +992,12 @@ void amf3writer::Write(amf3object & obj)
 	}
 	if (obj.type == Array)
 	{
-		Write(obj._value._array, obj);
+		Write(obj._array.get(), obj);
 		return;
 	}
 	if (obj.type == Object)
 	{
-		Write(obj._value._object, obj);
+		Write(obj._object.get(), obj);
 		return;
 	}
 	throw "Invalid object type";
@@ -1431,10 +1057,10 @@ void amf3writer::TypelessWrite(int integer)
 
 	if ((integer & (0xFF << 21)) != 0)
 	{
-		stream[position++] = (char)(((integer >> 22) & 0x07f) | 0x80);
-		stream[position++] = (char)(((integer >> 15) & 0x07f) | 0x80);
-		stream[position++] = (char)(((integer >> 8) & 0x07f) | 0x80);
-		stream[position++] = (char)((integer & 0x07f) | 0x80);
+		stream[position++] = (uint8_t)(((integer >> 22) & 0x7f) | 0x80);
+		stream[position++] = (uint8_t)(((integer >> 15) & 0x7f) | 0x80);
+		stream[position++] = (uint8_t)(((integer >> 8) & 0x7f) | 0x80);
+		stream[position++] = (uint8_t)(integer & 0xff);
 		return;
 	}
 
@@ -1454,7 +1080,7 @@ void amf3writer::TypelessWrite(int integer)
 }
 void amf3writer::TypelessWrite(double number)
 {
-	char num[8];
+	unsigned char num[8];
 
 	*(double*)num = number;
 
@@ -1497,7 +1123,7 @@ void amf3writer::TypelessWrite(string str)
 
 	//Need UTF8 code here...
 	TypelessWrite( (int)(str.length() << 1 | 1) );
-	strcpy(stream+position, str.c_str());
+	strcpy_s(stream+position, str.length()+1, str.c_str());
 	position += str.length();
 
 	typedef pair <int, string> Int_Pair;
@@ -1522,20 +1148,20 @@ void amf3writer::TypelessWrite(amf3array * _array, amf3object & obj)
 	objectTable.insert( Int_Pair(objectTable.size(), obj) );
 	//encapslist.AddObj(obj);
 
-	TypelessWrite( int(obj._value._array->dense.size() << 1 | 1) );
+	TypelessWrite( int(obj._array->dense.size() << 1 | 1) );
 
 //	if (obj._value._array->associative.propnames.size() > 0)
 	{
-		WriteDictionary(&obj._value._array->associative);
+		WriteDictionary(&obj._array->associative);
 	}
 //	else
 	{
 		//TypelessWrite(1);
 	}
 
-	for (int i = 0; i < obj._value._array->dense.size(); ++i)
+	for (int i = 0; i < obj._array->dense.size(); ++i)
 	{
-		Write(obj._value._array->dense.at(i));
+		Write(obj._array->dense.at(i));
 	}
 }
 void amf3writer::TypelessWrite(amf3objectmap * _object, amf3object & obj)
@@ -1548,16 +1174,16 @@ void amf3writer::TypelessWrite(amf3objectmap * _object, amf3object & obj)
 	iter = classdefTable.begin();
 	for (int i = 0; i < classdefTable.size(); ++iter, ++i)
 	{
-		if ((iter->second).IsEqual(obj._value._object->classdef))
+		if ((iter->second).IsEqual(obj._object->classdef))
 		{
 			TypelessWrite((i << 2) | 1);
 			found = true;
-			if (obj._value._object->anoncd)
+			if (obj._object->anoncd)
 			{
-				obj._value._object->selfdel = false;
+				obj._object->selfdel = false;
 				//delete obj._value._object->classdef;
 				//obj._value._object->classdef = 0;
-				obj._value._object->classdef = iter->second;
+				obj._object->classdef = iter->second;
 			}
 			break;
 		}
@@ -1566,8 +1192,8 @@ void amf3writer::TypelessWrite(amf3objectmap * _object, amf3object & obj)
 	if (!found)
 	{
 		typedef pair <int, amf3classdef> Int_Pair;
-		classdefTable.insert( Int_Pair(classdefTable.size(), obj._value._object->classdef) );
-		deflist.AddObj(obj._value._object->classdef);
+		classdefTable.insert( Int_Pair(classdefTable.size(), obj._object->classdef) );
+		deflist.AddObj(obj._object->classdef);
 
 		int flags = Inline | InlineClassDef;
 		if (_object->classdef.externalizable)
@@ -1636,141 +1262,3 @@ void amf3writer::TypelessWrite(amf3objectmap * _object, amf3object & obj)
 
 }
 
-amf3objectmap::~amf3objectmap(void)
-{
-	amf3objectcreate--;
-// 	if (classdef && selfdel == true)
-// 		delete classdef;
-	/*if (anoncd)
-	{
-		delete classdef;
-	}*/
-	for (int i = 0; i < properties.propnames.size(); ++i)
-	{
-//		delete[] properties.propnames.at(i);
-	}
-	for (int i = 0; i < properties.properties.size(); ++i)
-	{
-//		delete properties.properties.at(i);
-	}
-// 	properties.properties.clear();
-// 	properties.propnames.clear();
-}
-
-amf3object & amf3objectmap::Get(string key)
-{
-	return properties.GetObj(key);
-}
-void amf3objectmap::Add(string key, amf3object & obj)
-{
-	properties.AddObj(key, obj);
-}
-int amf3objectmap::Exists(string key)
-{
-	return properties.Exists(key);
-}
-
-amf3array::amf3array(void)
-{
-	amf3arraycreate++;
-	this->type = 1;
-	//dense.resize(3000);
-}
-
-
-amf3array::~amf3array(void)
-{
-	amf3arraycreate--;
-
-	for (int i = 0; i < associative.properties.size(); ++i)
-	{
-//		delete[] associative.propnames.at(i);
-	}
-	for (int i = 0; i < associative.properties.size(); ++i)
-	{
-//		delete associative.properties.at(i);
-	}
-	for (int i = 0; i < dense.size(); ++i)
-	{
-//		delete dense.at(i);
-	}
-	dense.clear();
-}
-
-void amf3array::Add(amf3object & obj)
-{
-	this->type = 1;
-	dense.push_back(obj);
-}
-
-
-void amf3array::Add(string key, amf3object & obj)
-{
-	this->type = 2;
-	associative.AddObj(key, obj);
-	dense.push_back(obj);
-}
-
-
-amf3object & amf3array::Get(int id)
-{
-// 	if (dense.size() <= id)
-// 	{
-// 		return;
-// 	}
-	return dense.at(id);
-}
-
-
-amf3object & amf3array::Get(string key)
-{
-	return associative.GetObj(key);
-}
-
-
-inline bool amf3object::IsEqual (amf3object & obj, amf3object & obj2)
-{
-	if (obj2.type != obj.type)
-		return false;
-	switch (obj2.type)
-	{
-	case 2:
-		if (obj._value.booltest == false)
-			return true;
-		break;
-	case 3:
-		if (obj._value.booltest == true)
-			return true;
-		break;
-	case 4:
-		if (obj._value.integer == obj2._value.integer)
-			return true;
-		break;
-	case 5:
-		if (obj._value.number == obj2._value.number)
-			return true;
-		break;
-	case 6:
-		if (obj.text == obj2.text)
-			return true;
-		break;
-	case 7:
-		return false;
-	case 8:
-		if (obj.date == obj2.date)
-			return true;
-		break;
-	case 9:
-		if (obj2._value._array->IsEqual(obj._value._array))
-			return true;
-		break;
-	case 10:
-		if (obj2._value._object->IsEqual(obj._value._object))
-			return true;
-		break;
-	case 11:
-	case 12:
-		return false;
-	}
-	return false;
-}
