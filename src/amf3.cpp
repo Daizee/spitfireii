@@ -240,6 +240,21 @@ OPERATORSETINTEGER_DEF(uint32_t);
 OPERATORSETNUMBER_DEF(uint64_t);
 OPERATORSETNUMBER_DEF(double);
 
+amf3object& amf3object::operator=(const bool &val) {
+	Reset();
+	if (val)
+	{
+		type = True;
+		_value.booltest = true;
+	}
+	else
+	{
+		type = False;
+		_value.booltest = false;
+	}
+	return *this;
+}
+
 amf3object& amf3object::operator=(const amf3object &val) {
 	Reset();
 	InternalCopy(val);

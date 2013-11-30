@@ -281,7 +281,7 @@ extern int asprintf(char **str, const char *fmt, ...);
 #endif
 
 
-#define KeyExists(x,y) ((x._value._object->Exists(y))>=0)
+#define KeyExists(x,y) ((x._object->Exists(y))>=0)
 #define IsString(x) (x.type==String)
 #define IsObject(x) (x.type==Object)
 

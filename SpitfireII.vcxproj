@@ -179,7 +179,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>include\boost_1_53_0;include;include\asio;C:\Helbreath Project\HBLoginsII\bin\poco-1.4.6p1\Data\MySQL\include;C:\Helbreath Project\HBLoginsII\bin\poco-1.4.6p1\Data\SQLite\include;C:\Helbreath Project\HBLoginsII\bin\poco-1.4.6p1\Foundation\include;C:\Helbreath Project\HBLoginsII\bin\poco-1.4.6p1\Data\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include\boost_1_53_0;include;include\asio;Z:\include\</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x0601;BOOST_ALL_DYN_LINK;WIN32;_CONSOLE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
