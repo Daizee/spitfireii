@@ -151,15 +151,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			Client * clnt = gserver->GetClientByName((char*)data["targetName"]);
 			if (!clnt)
 			{
-				obj2["cmd"] = "common.privateChat";
-				data2["msg"] = data["msg"];
-				data2["packageId"] = 0.0f;
-				data2["ok"] = -41;
-				stringstream ss;
-				ss << "Player " << data["targetName"].c_str() << " doesn't exist.";
-				data2["errorMsg"] = ss.str();
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("common.privateChat", -41, "Player " + (string)data["targetName"] + " doesn't exist."));
 				UNLOCK(M_CLIENTLIST);
 				return;
 			}
@@ -220,12 +212,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (client->m_allianceid <= 0)
 			{
-				obj2["cmd"] = "common.allianceChat";
-				data2["errorMsg"] = "To send an alliance message, you must be a member of an alliance";
-				data2["ok"] = -99;
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("common.allianceChat", -99, "To send an alliance message, you must be a member of an alliance"));
 				return;
 			}
 
@@ -336,10 +323,8 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (client->m_changedface || faceurl.length() > 30 || faceurl.length() < 0 || sex < 0 || sex > 1)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invalid setting."; //TODO not a valid error message. need to obtain official response for invalid request
-
-				gserver->SendObject(c, obj2);
+				//TODO not a valid error message. need to obtain official response for invalid request
+				gserver->SendObject(c, gserver->CreateError("common.changeUserFace", -99, "Invalid setting."));
 				return;
 			}
 			data2["ok"] = 1;
@@ -433,15 +418,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			if ((client->m_accountid > 0) && (client->m_citycount > 0))
 			{
 				// already has a city
-				amf3object obj;
-				obj["cmd"] = "common.createNewPlayer";
-				obj["data"] = amf3object();
-				amf3object & data = obj["data"];
-				data["packageId"] = 0.0f;
-				data["ok"] = -86;
-				data["errorMsg"] = "City/Account exists.";
-
-				gserver->SendObject(c, obj);
+				gserver->SendObject(c, gserver->CreateError("common.createNewPlayer", -86, "City/Account exists."));
 				return;
 			}
 
@@ -450,15 +427,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			if (zone < 0 || zone > 15 || userName.length() < 1 || userName.length() > 20 || flag.length() < 1 || flag.length() > 5 || castleName.length() < 1 || castleName.length() > 10
 				|| faceUrl.length() < 1 || faceUrl.length() > 30 || sex < 0 || sex > 1)
 			{
-				amf3object obj;
-				obj["cmd"] = "common.createNewPlayer";
-				obj["data"] = amf3object();
-				amf3object & data = obj["data"];
-				data["packageId"] = 0.0f;
-				data["ok"] = -87;
-				data["errorMsg"] = "Invalid data sent.";
-
-				gserver->SendObject(c, obj);
+				gserver->SendObject(c, gserver->CreateError("common.createNewPlayer", -87, "Invalid data sent."));
 				return;
 			}
 
@@ -474,15 +443,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				if (rs.rowCount() > 0)
 				{
 					//player name exists
-					amf3object obj;
-					obj["cmd"] = "common.createNewPlayer";
-					obj["data"] = amf3object();
-					amf3object & data = obj["data"];
-					data["packageId"] = 0.0f;
-					data["ok"] = -88;
-					data["errorMsg"] = "Player name taken";
-
-					gserver->SendObject(c, obj);
+					gserver->SendObject(c, gserver->CreateError("common.createNewPlayer", -88, "Player name taken"));
 					return;
 				}
 			}
@@ -503,15 +464,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					if (gserver->map->m_tile[randomid].m_type != FLAT || gserver->map->m_tile[randomid].m_ownerid != -1)
 					{
 						gserver->consoleLogger->information("Error. Flat not empty!");
-						amf3object obj;
-						obj["cmd"] = "common.createNewPlayer";
-						obj["data"] = amf3object();
-						amf3object & data = obj["data"];
-						data["packageId"] = 0.0f;
-						data["ok"] = -25;
-						data["errorMsg"] = "Error with account creation.";
-
-						gserver->SendObject(c, obj);
+						gserver->SendObject(c, gserver->CreateError("common.createNewPlayer", -25, "Error with account creation. #-25"));
 						return;
 					}
 
@@ -539,15 +492,7 @@ void request_handler::handle_request(const request& req, reply& rep)
  						if (!stmt.done())
  						{
  							gserver->consoleLogger->information("Unable to create account.");
-							amf3object obj;
-							obj["cmd"] = "common.createNewPlayer";
-							obj["data"] = amf3object();
-							amf3object & data = obj["data"];
-							data["packageId"] = 0.0f;
-							data["ok"] = -25;
-							data["errorMsg"] = "Error with account creation.";
-
-							gserver->SendObject(c, obj);
+							gserver->SendObject(c, gserver->CreateError("common.createNewPlayer", -26, "Error with account creation. #-26"));
 							return;
  						}
 						Statement lastinsert = ( ses << "SELECT LAST_INSERT_ID()" );
@@ -562,15 +507,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 						else
 						{
 							gserver->consoleLogger->information("Unable to create account.");
-							amf3object obj;
-							obj["cmd"] = "common.createNewPlayer";
-							obj["data"] = amf3object();
-							amf3object & data = obj["data"];
-							data["packageId"] = 0.0f;
-							data["ok"] = -25;
-							data["errorMsg"] = "Error with account creation.";
-
-							gserver->SendObject(c, obj);
+							gserver->SendObject(c, gserver->CreateError("common.createNewPlayer", -27, "Error with account creation. #-27"));
 							return;
 						}
 
@@ -602,15 +539,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 						//gserver->FileLog()->Log("Unable to create city.");
 						//error making city
 						gserver->consoleLogger->information("Error. Unable to insert new city row.");
-						amf3object obj;
-						obj["cmd"] = "common.createNewPlayer";
-						obj["data"] = amf3object();
-						amf3object & data = obj["data"];
-						data["packageId"] = 0.0f;
-						data["ok"] = -25;
-						data["errorMsg"] = "Error with account creation.";
-
-						gserver->SendObject(c, obj);
+						gserver->SendObject(c, gserver->CreateError("common.createNewPlayer", -28, "Error with account creation. #-28"));
 						return;
 					}
 
@@ -636,15 +565,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					else
 					{
 						gserver->consoleLogger->information("Unable to create account.");
-						amf3object obj;
-						obj["cmd"] = "common.createNewPlayer";
-						obj["data"] = amf3object();
-						amf3object & data = obj["data"];
-						data["packageId"] = 0.0f;
-						data["ok"] = -25;
-						data["errorMsg"] = "Error with account creation.";
-
-						gserver->SendObject(c, obj);
+						gserver->SendObject(c, gserver->CreateError("common.createNewPlayer", -29, "Error with account creation. #-29"));
 						return;
 					}
 
@@ -700,15 +621,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				else
 				{
 					//state is full
-					amf3object obj;
-					obj["cmd"] = "common.createNewPlayer";
-					obj["data"] = amf3object();
-					amf3object & data = obj["data"];
-					data["packageId"] = 0.0f;
-					data["ok"] = -25;
-					data["errorMsg"] = "No open flats exist.";
-
-					gserver->SendObject(c, obj);
+					gserver->SendObject(c, gserver->CreateError("common.createNewPlayer", -25, "No open flats exist."));
 					return;
 				}
 
@@ -1058,11 +971,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if ((buildingtype > 34 || buildingtype <= 0) || pcity->GetBuilding(positionid)->type || ((gserver->m_buildingconfig[buildingtype][0].limit > 0) && (gserver->m_buildingconfig[buildingtype][0].limit <= pcity->GetBuildingCount(buildingtype))))
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Can't build building.";
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("castle.newBuilding", -99, "Can't build building."));
 				return;
 			}
 
@@ -1070,11 +979,8 @@ void request_handler::handle_request(const request& req, reply& rep)
 			{
 				if (pcity->m_innerbuildings[i].status != 0)
 				{
-					data2["ok"] = -48;
-					data2["errorMsg"] = "One building allowed to be built at a time.";
-					data2["packageId"] = 0.0f;
-
-					gserver->SendObject(c, obj2);
+					// TODO: Support hammer item for multiple constructions at once
+					gserver->SendObject(c, gserver->CreateError("castle.newBuilding", -48, "One building allowed to be built at a time."));
 					return;
 				}
 			}
@@ -1082,22 +988,15 @@ void request_handler::handle_request(const request& req, reply& rep)
 			{
 				if (pcity->m_outerbuildings[i].status != 0)
 				{
-					data2["ok"] = -48;
-					data2["errorMsg"] = "One building allowed to be built at a time.";
-					data2["packageId"] = 0.0f;
-
-					gserver->SendObject(c, obj2);
+					// TODO: Support hammer item for multiple constructions at once
+					gserver->SendObject(c, gserver->CreateError("castle.newBuilding", -48, "One building allowed to be built at a time."));
 					return;
 				}
 			}
 
 			if (!pcity->CheckBuildingPrereqs(buildingtype, 0))
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Building Prerequisites not met.";
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("castle.newBuilding", -99, "Building Prerequisites not met."));
 				return;
 			}
 
@@ -1107,11 +1006,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				|| (gserver->m_buildingconfig[buildingtype][0].iron > pcity->m_resources.iron)
 				|| (gserver->m_buildingconfig[buildingtype][0].gold > pcity->m_resources.gold))
 			{
-				data2["ok"] = -1;
-				data2["errorMsg"] = "Not enough resources.";
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("castle.newBuilding", -1, "Not enough resources."));
 				return;
 			}
 			data2["ok"] = 1;
@@ -1178,11 +1073,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if ((bldg->type > 34 || bldg->type <= 0) || (bldg->level == 0))
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Can't destroy building.";
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("castle.destructBuilding", -99, "Can't destroy building."));
 				return;
 			}
 
@@ -1191,11 +1082,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			{
 				if (pcity->m_innerbuildings[i].status != 0)
 				{
-					data2["ok"] = -48;
-					data2["errorMsg"] = "One building allowed to be built at a time.";
-					data2["packageId"] = 0.0f;
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("castle.destructBuilding", -48, "One building allowed to be built at a time."));
 					return;
 				}
 			}
@@ -1203,11 +1090,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			{
 				if (pcity->m_outerbuildings[i].status != 0)
 				{
-					data2["ok"] = -48;
-					data2["errorMsg"] = "One building allowed to be built at a time.";
-					data2["packageId"] = 0.0f;
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("castle.destructBuilding", -48, "One building allowed to be built at a time."));
 					return;
 				}
 			}
@@ -1271,11 +1154,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (bldg->status != 0)
 			{
-				data2["ok"] = -45;
-				data2["errorMsg"] = "Invalid building status: Your network connection might have experienced delay or congestion. If this error message persists, please refresh or reload this page to login to the game again.";
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("castle.upgradeBuilding", -45, "Invalid building status: Your network connection might have experienced delay or congestion. If this error message persists, please refresh or reload this page to login to the game again."));
 				return;
 			}
 
@@ -1283,11 +1162,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			{
 				if (pcity->m_innerbuildings[i].status != 0)
 				{
-					data2["ok"] = -48;
-					data2["errorMsg"] = "One building allowed to be built at a time.";
-					data2["packageId"] = 0.0f;
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("castle.upgradeBuilding", -48, "One building allowed to be built at a time."));
 					return;
 				}
 			}
@@ -1295,22 +1170,14 @@ void request_handler::handle_request(const request& req, reply& rep)
 			{
 				if (pcity->m_outerbuildings[i].status != 0)
 				{
-					data2["ok"] = -48;
-					data2["errorMsg"] = "One building allowed to be built at a time.";
-					data2["packageId"] = 0.0f;
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("castle.upgradeBuilding", -48, "One building allowed to be built at a time."));
 					return;
 				}
 			}
 
 			if (!pcity->CheckBuildingPrereqs(buildingtype, buildinglevel))
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Building Prerequisites not met.";
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("castle.upgradeBuilding", -99, "Building Prerequisites not met."));
 				return;
 			}
 
@@ -1320,11 +1187,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				|| (gserver->m_buildingconfig[buildingtype][buildinglevel].iron > pcity->m_resources.iron)
 				|| (gserver->m_buildingconfig[buildingtype][buildinglevel].gold > pcity->m_resources.gold))
 			{
-				data2["ok"] = -1;
-				data2["errorMsg"] = "Not enough resources.";
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("castle.upgradeBuilding", -1, "Not enough resources."));
 				return;
 			}
 
@@ -1529,26 +1392,13 @@ void request_handler::handle_request(const request& req, reply& rep)
 				else
 				{
 					//over 5 mins
-					obj2["cmd"] = "castle.speedUpBuildCommand";
-					data2["packageId"] = 0.0f;
-					data2["ok"] = -99;
-					data2["errorMsg"] = "Invalid speed up.";// TODO get 5 min speed up error - castle.speedUpBuildCommand
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("castle.speedUpBuildCommand", -99, "Invalid speed up."));// TODO get 5 min speed up error - castle.speedUpBuildCommand
 				}
 			}
 			else
 			{
 				//is not under 5 mins, apply an item
 				int itemcount = client->GetItemCount((string)speeditemid);
-
-				amf3object obj3 = amf3object();
-				obj3["cmd"] = "castle.speedUpBuildCommand";
-				obj3["data"] = amf3object();
-				amf3object & data3 = obj3["data"];
-				data3["packageId"] = 0.0f;
-				data3["ok"] = -99;// TODO find error value -- castle.speedUpBuildCommand
-				data3["errorMsg"] = "Not enough cents.";
 
 				int cents = 0;
 				int reducetime = 0;
@@ -1602,7 +1452,8 @@ void request_handler::handle_request(const request& req, reply& rep)
 				{
 					if (client->m_cents < cents)
 					{
-						gserver->SendObject(c, obj3); // not enough item and not enough cents
+						// TODO find error value -- castle.speedUpBuildCommand
+						gserver->SendObject(c, gserver->CreateError("castle.speedUpBuildCommand", -99, "Not enough cents."));// not enough item and not enough cents
 						return;
 					}
 					//not enough item, but can buy with cents
@@ -1710,11 +1561,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					}
 					else
 					{
-						data2["ok"] = -99;
-						data2["errorMsg"] = "Not being constructed.";
-						data2["packageId"] = 0.0f;
-
-						gserver->SendObject(c, obj2);
+						gserver->SendObject(c, gserver->CreateError("castle.cancleBuildCommand", -99, "Not being constructed."));
 						UNLOCK(M_TIMEDLIST);
 						return;
 					}
@@ -1995,10 +1842,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			Alliance * alliance = gserver->m_alliances->AllianceByName(alliancename);
 			if (alliance == (Alliance*)-1)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Alliance no longer exists.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.rejectComeinAlliance", -99, "Alliance no longer exists."));
 				return;
 			}
 
@@ -2020,17 +1864,11 @@ void request_handler::handle_request(const request& req, reply& rep)
 			}
 			else
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invite no longer exists.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.rejectComeinAlliance", -99, "Invite no longer exists."));
 				return;
 			}
 			UNLOCK(M_ALLIANCELIST);
-			data2["ok"] = -99;
-			data2["errorMsg"] = "An unknown error occurred.";
-
-			gserver->SendObject(c, obj2);
+			gserver->SendObject(c, gserver->CreateError("alliance.rejectComeinAlliance", -99, "An unknown error occurred."));
 			return;
 		}
 		if ((command == "agreeComeinAllianceList"))
@@ -2040,10 +1878,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if ((client->m_allianceid == 0) || (client->m_alliancerank > DEF_ALLIANCEPRES))
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not enough rank.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.agreeComeinAllianceList", -99, "Not enough rank."));
 				return;
 			}
 
@@ -2052,10 +1887,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (alliance == (Alliance*)-1)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Alliance does not exist.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.agreeComeinAllianceList", -99, "Alliance does not exist."));
 				return;
 			}
 
@@ -2090,19 +1922,13 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "You are not in an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.resignForAlliance", -99, "You are not in an alliance."));
 				return;
 			}
 			Alliance * alliance = client->GetAlliance();
 			if ((client->m_alliancerank == DEF_ALLIANCEHOST) && (alliance->m_currentmembers > 1))
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Resignation refused. Please transfer your host title to other before you resign.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.resignForAlliance", -99, "Resignation refused. Please transfer your host title to other before you resign."));
 				return;
 			}
 			else
@@ -2110,10 +1936,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				//Only person left is host - disband alliance
 				if (!gserver->m_alliances->RemoveFromAlliance(client->m_allianceid, client))
 				{
-					data2["ok"] = -99;
-					data2["errorMsg"] = "Unable to leave alliance. Please contact support.";
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("alliance.resignForAlliance", -99, "Unable to leave alliance. Please contact support."));
 					return;
 				}
 				gserver->m_alliances->DeleteAlliance(alliance);
@@ -2123,10 +1946,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			LOCK(M_ALLIANCELIST);
 			if (!gserver->m_alliances->RemoveFromAlliance(client->m_allianceid, client))
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Unable to leave alliance. Please contact support.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.resignForAlliance", -99, "Unable to leave alliance. Please contact support."));
 				UNLOCK(M_ALLIANCELIST);
 				return;
 			}
@@ -2144,10 +1964,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (client->m_allianceid < 0)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.getAllianceMembers", -99, "Not a member of an alliance."));
 				return;
 			}
 			MULTILOCK(M_ALLIANCELIST, M_CLIENTLIST);
@@ -2155,10 +1972,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (alliance == (Alliance*)-1)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invalid Alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.getAllianceMembers", -99, "Invalid Alliance."));
 				UNLOCK(M_CLIENTLIST);
 				UNLOCK(M_ALLIANCELIST);
 				return;
@@ -2230,10 +2044,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (alliance == (Alliance*)-1)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Alliance does not exist.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.getAllianceInfo", -99, "Alliance does not exist."));
 				return;
 			}
 
@@ -2264,10 +2075,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (alliance == (Alliance*)-1)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Alliance does not exist.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.userWantInAlliance", -99, "Alliance does not exist."));
 				return;
 			}
 
@@ -2299,10 +2107,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (client->m_allianceapply.length() == 0)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not applied.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.cancelUserWantInAlliance", -99, "Not applied."));
 				return;
 			}
 
@@ -2311,10 +2116,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (alliance == (Alliance*)-1)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Alliance does not exist.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.cancelUserWantInAlliance", -99, "Alliance does not exist."));
 				return;
 			}
 
@@ -2349,10 +2151,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.addUsertoAllianceList", -99, "Not a member of an alliance."));
 				return;
 			}
 
@@ -2392,18 +2191,12 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.addUsertoAlliance", -99, "Not a member of an alliance."));
 				return;
 			}
 			if (client->m_alliancerank > DEF_ALLIANCEPRES)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not enough rank.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.addUsertoAlliance", -99, "Not enough rank."));
 				return;
 			}
 
@@ -2421,27 +2214,21 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (invitee == 0)
 			{
-				data2["ok"] = -41;
 				string msg;
 				msg = "Player ";
 				msg += username;
 				msg += " doesn't exist.";
-				data2["errorMsg"] = msg;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.addUsertoAlliance", -41, msg));
 				UNLOCK(M_ALLIANCELIST);
 				UNLOCK(M_CLIENTLIST);
 				return;
 			}
 			if (invitee->HasAlliance())
 			{
-				data2["ok"] = -99;
 				string msg;
 				msg = username;
 				msg += "is already a member of other alliance.";
-				data2["errorMsg"] = msg;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.addUsertoAlliance", -99, msg));
 				UNLOCK(M_ALLIANCELIST);
 				UNLOCK(M_CLIENTLIST);
 				return;
@@ -2470,10 +2257,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.canceladdUsertoAlliance", -99, "Not a member of an alliance."));
 				return;
 			}
 
@@ -2499,10 +2283,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.cancelagreeComeinAlliance", -99, "Not a member of an alliance."));
 				return;
 			}
 
@@ -2529,10 +2310,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.setAllianceFriendship", -99, "Not a member of an alliance."));
 				return;
 			}
 
@@ -2547,10 +2325,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			if (otheralliance == (Alliance*)-1)
 			{
 				//doesn't exist
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Alliance does not exist.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.setAllianceFriendship", -99, "Alliance does not exist."));
 				return;
 			}
 
@@ -2561,10 +2336,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				if (alliance->IsAlly(otheralliance->m_allianceid))
 				{
 					//already allied
-					data2["ok"] = -99;
-					data2["errorMsg"] = "Alliance is already an ally.";
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("alliance.setAllianceFriendship", -99, "Alliance is already an ally."));
 					return;
 				}
 				alliance->Ally(otheralliance->m_allianceid);
@@ -2574,10 +2346,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				if (alliance->IsNeutral(otheralliance->m_allianceid))
 				{
 					//already neutral
-					data2["ok"] = -99;
-					data2["errorMsg"] = "Alliance is already neutral.";
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("alliance.setAllianceFriendship", -99, "Alliance is already neutral."));
 					return;
 				}
 				alliance->Neutral(otheralliance->m_allianceid);
@@ -2587,19 +2356,14 @@ void request_handler::handle_request(const request& req, reply& rep)
 				if (alliance->IsEnemy(otheralliance->m_allianceid))
 				{
 					//already enemy
-					data2["ok"] = -99;
-					data2["errorMsg"] = "Alliance is already an enemy.";
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("alliance.setAllianceFriendship", -99, "Alliance is already an enemy."));
 					return;
 				}
+				// TODO copy declare war cooldown?
 				if (unixtime() < alliance->enemyactioncooldown)
 				{
 					//Declared war too soon
-					data2["ok"] = -99;
-					data2["errorMsg"] = "You have already declared war recently.";
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("alliance.setAllianceFriendship", -99, "You have already declared war recently."));
 					return;
 				}
 
@@ -2616,10 +2380,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.getAllianceFriendshipList", -99, "Not a member of an alliance."));
 				return;
 			}
 
@@ -2699,32 +2460,24 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (pcity->m_resources.gold < 10000)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not enough gold.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.createAlliance", -99, "Not enough gold."));
 				return;
 			}
 
 			if (!gserver->m_alliances->CheckName(alliancename) || strlen(alliancename) < 2)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Illegal naming, please choose another name.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.createAlliance", -99, "Illegal naming, please choose another name."));
 				return;
 			}
 
 			LOCK(M_ALLIANCELIST);
 			if (gserver->m_alliances->AllianceByName(alliancename) != (Alliance*)-1)
 			{
-				data2["ok"] = -12;
 				string error = "Alliance already existed: ";
 				error += alliancename;
 				error += ".";
-				data2["errorMsg"] = error;
 
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.createAlliance", -12, error));
 				UNLOCK(M_ALLIANCELIST);
 				return;
 			}
@@ -2747,10 +2500,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					client->PlayerUpdate();
 					pcity->ResourceUpdate();
 
-					data2["ok"] = -99;
-					data2["errorMsg"] = "Alliance created but cannot join. Please contact support.";
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("alliance.createAlliance", -99, "Alliance created but cannot join. Please contact support."));
 					UNLOCK(M_ALLIANCELIST);
 					return;
 				}
@@ -2759,10 +2509,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					client->PlayerUpdate();
 					pcity->ResourceUpdate();
 
-					data2["ok"] = -99;
-					data2["errorMsg"] = "Alliance created but cannot set rank to host. Please contact support.";
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("alliance.createAlliance", -99, "Alliance created but cannot set rank to host. Please contact support."));
 					UNLOCK(M_ALLIANCELIST);
 					return;
 				}
@@ -2780,10 +2527,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			}
 			else
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Cannot create alliance. Please contact support.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.createAlliance", -99, "Cannot create alliance. Please contact support."));
 				UNLOCK(M_ALLIANCELIST);
 				return;
 			}
@@ -2800,20 +2544,14 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.setAllInfoForAlliance", -99, "Not a member of an alliance."));
 				return;
 			}
 			LOCK(M_ALLIANCELIST);
 			Alliance * aliance = client->GetAlliance();
 			if (aliance->m_name != alliancename)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Error.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.setAllInfoForAlliance", -99, "Error."));
 				return;
 			}
 
@@ -2834,10 +2572,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.getPowerFromAlliance", -99, "Not a member of an alliance."));
 				return;
 			}
 			data2["ok"] = 1;
@@ -2853,20 +2588,14 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.resetTopPowerForAlliance", -99, "Not a member of an alliance."));
 				return;
 			}
 
 			if (client->m_alliancerank != DEF_ALLIANCEHOST)
 			{
 				//you're not the host.. what are you doing?
-				data2["ok"] = -42;
-				data2["errorMsg"] = "You are not entitled to operate.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.resetTopPowerForAlliance", -42, "You are not entitled to operate."));
 				return;
 			}
 
@@ -2879,10 +2608,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				Client * tclient = gserver->GetClientByName(passtoname);
 				if (tclient->m_alliancerank != DEF_ALLIANCEVICEHOST)
 				{
-					data2["ok"] = -88;
-					data2["errorMsg"] = "The Host title of the Alliance can only be transferred to Vice Host. You need to promote this player first.";
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("alliance.resetTopPowerForAlliance", -88, "The Host title of the Alliance can only be transferred to Vice Host. You need to promote this player first."));
 					return;
 				}
 				//everything checks out. target is vice host and you are host
@@ -2899,19 +2625,13 @@ void request_handler::handle_request(const request& req, reply& rep)
 			}
 			else
 			{
-				data2["ok"] = -41;
-				data2["errorMsg"] = "Player " + passtoname + " doesn't exist.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.resetTopPowerForAlliance", -41, "Player " + passtoname + " doesn't exist."));
 				return;
 			}
 		}
 		if ((command == "agreeComeinAllianceByUser"))//TODO: alliance invites player, player accepts via embassy
 		{
-			obj2["cmd"] = "alliance.agreeComeinAllianceByUser";
-			data2["packageId"] = 0.0f;
-			data2["ok"] = -99;
-			data2["errorMsg"] = "Not a member of an alliance.";
+			gserver->SendObject(c, gserver->CreateError("alliance.agreeComeinAllianceByUser", -99, "Not a member of an alliance."));
 
 //			data["castleId"];
 //			data["allianceName"];
@@ -2927,10 +2647,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.agreeComeinAllianceByLeader", -99, "Not a member of an alliance."));
 				return;
 			}
 
@@ -2940,27 +2657,14 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (invitee == 0)
 			{
-				data2["ok"] = -41;
-				string msg;
-				msg = "Player ";
-				msg += username;
-				msg += " doesn't exist.";
-				data2["errorMsg"] = msg;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.agreeComeinAllianceByLeader", -41, "Player " + username + " doesn't exist."));
 				UNLOCK(M_ALLIANCELIST);
 				UNLOCK(M_CLIENTLIST);
 				return;
 			}
 			if (invitee->HasAlliance())
 			{
-				data2["ok"] = -99;
-				string msg;
-				msg = username;
-				msg += " is already a member of other alliance.";
-				data2["errorMsg"] = msg;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.agreeComeinAllianceByLeader", -99, username + " is already a member of other alliance."));
 				UNLOCK(M_ALLIANCELIST);
 				UNLOCK(M_CLIENTLIST);
 				return;
@@ -2989,10 +2693,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.setPowerForUserByAlliance", -99, "Not a member of an alliance."));
 				return;
 			}
 
@@ -3001,10 +2702,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!tar || !client->GetAlliance()->HasMember(username))
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Member does not exist.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.setPowerForUserByAlliance", -99, "Member does not exist."));
 				UNLOCK(M_ALLIANCELIST);
 				UNLOCK(M_CLIENTLIST);
 				return;
@@ -3030,10 +2728,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!client->HasAlliance())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a member of an alliance.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.kickOutMemberfromAlliance", -99, "Not a member of an alliance."));
 				return;
 			}
 
@@ -3044,10 +2739,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!tar || !client->GetAlliance()->HasMember(username))
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Member does not exist.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.kickOutMemberfromAlliance", -99, "Member does not exist."));
 				UNLOCK(M_ALLIANCELIST);
 				UNLOCK(M_CLIENTLIST);
 				return;
@@ -3055,10 +2747,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (username == client->m_playername)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Cannot kick yourself.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.kickOutMemberfromAlliance", -99, "Cannot kick yourself."));
 				UNLOCK(M_ALLIANCELIST);
 				UNLOCK(M_CLIENTLIST);
 				return;
@@ -3066,10 +2755,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (client->m_alliancerank >= tar->m_alliancerank)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Cannot kick someone higher ranking than you.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.kickOutMemberfromAlliance", -99, "Cannot kick someone higher ranking than you."));
 				UNLOCK(M_ALLIANCELIST);
 				UNLOCK(M_CLIENTLIST);
 				return;
@@ -3077,10 +2763,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!gserver->m_alliances->RemoveFromAlliance(client->m_allianceid, tar))
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Could not kick out member.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("alliance.kickOutMemberfromAlliance", -99, "Could not kick out member."));
 				UNLOCK(M_ALLIANCELIST);
 				UNLOCK(M_CLIENTLIST);
 				return;
@@ -3233,12 +2916,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (techid < 0 || techid > 25 || client->m_research[techid].level >= 10 || gserver->m_researchconfig[techid][client->m_research[techid].level].time == 0)
 			{
-				obj2["cmd"] = "tech.research";
-				data2["ok"] = -99;
-				data2["packageId"] = 0.0f;
-				data2["errorMsg"] = "Invalid technology.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("tech.research", -99, "Invalid technology."));
 				return;
 			}
 
@@ -3257,12 +2935,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					|| (researchconfig->iron > pcity->m_resources.iron)
 					|| (researchconfig->gold > pcity->m_resources.gold))
 				{
-					obj2["cmd"] = "tech.research";
-					data2["ok"] = -99;
-					data2["packageId"] = 0.0f;
-					data2["errorMsg"] = "Not enough resources.";
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("tech.research", -99, "Not enough resources."));
 					return;
 				}
 				obj2["cmd"] = "tech.research";
@@ -3380,12 +3053,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			}
 			else
 			{
-				obj2["cmd"] = "tech.research";
-				data2["ok"] = -99;
-				data2["packageId"] = 0.0f;
-				data2["errorMsg"] = "Research already in progress.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("tech.research", -99, "Research already in progress."));
 				return;
 			}
 		}
@@ -3409,12 +3077,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!pcity || !pcity->m_researching || techid == 0)
 			{
-				obj2["cmd"] = "tech.cancelResearch";
-				data2["ok"] = -99;
-				data2["packageId"] = 0.0f;
-				data2["errorMsg"] = "Invalid city.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("tech.cancelResearch", -99, "Invalid city."));
 				return;
 			}
 
@@ -3488,12 +3151,8 @@ void request_handler::handle_request(const request& req, reply& rep)
 			}
 			if (research == 0)
 			{
-				obj2["cmd"] = "tech.speedUpResearch";
-				data2["packageId"] = 0.0f;
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invalid tech.";//TODO: get error message for city not having research -- tech.speedUpResearch
-
-				gserver->SendObject(c, obj2);
+				//TODO: get error message for city not having research -- tech.speedUpResearch
+				gserver->SendObject(c, gserver->CreateError("tech.speedUpResearch", -99, "Invalid tech."));
 				return;
 			}
 
@@ -3515,12 +3174,8 @@ void request_handler::handle_request(const request& req, reply& rep)
 				else
 				{
 					//over 5 mins
-					obj2["cmd"] = "tech.speedUpResearch";
-					data2["packageId"] = 0.0f;
-					data2["ok"] = -99;
-					data2["errorMsg"] = "Invalid speed up.";//TODO: get 5 min speed up error - tech.speedUpResearch
-
-					gserver->SendObject(c, obj2);
+					//TODO: get 5 min speed up error - tech.speedUpResearch
+					gserver->SendObject(c, gserver->CreateError("tech.speedUpResearch", -99, "Invalid speed up."));
 					return;
 				}
 			}
@@ -3528,14 +3183,6 @@ void request_handler::handle_request(const request& req, reply& rep)
 			{
 				//is not under 5 mins, apply an item
 				int itemcount = client->GetItemCount((string)speeditemid);
-
-				amf3object obj3 = amf3object();
-				obj3["cmd"] = "tech.speedUpResearch";
-				obj3["data"] = amf3object();
-				amf3object & data3 = obj3["data"];
-				data3["packageId"] = 0.0f;
-				data3["ok"] = -99;//TODO: find error value -- tech.speedUpResearch
-				data3["errorMsg"] = "Not enough cents.";
 
 				int cents = 0;
 				int reducetime = 0;
@@ -3588,7 +3235,9 @@ void request_handler::handle_request(const request& req, reply& rep)
 				{
 					if (client->m_cents < cents)
 					{
-						gserver->SendObject(c, obj3); // not enough item and not enough cents
+						// not enough item and not enough cents
+						//TODO: find error value -- tech.speedUpResearch
+						gserver->SendObject(c, gserver->CreateError("tech.speedUpResearch", -99, "Not enough cents."));
 						return;
 					}
 					//not enough item, but can buy with cents
@@ -3663,9 +3312,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			list<stClientRank>::iterator iter;
 			if (pagesize <= 0 || pagesize > 20 || pageno < 0 || pageno > 100000)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invalid data.";
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("rank.getPlayerRank", -99, "Invalid data."));
 				return;
 			}
 
@@ -3677,9 +3324,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if ((pageno-1)*pagesize > ranklist->size())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invalid page.";
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("rank.getPlayerRank", -99, "Invalid page."));
 				UNLOCK(M_RANKEDLIST);
 				return;
 			}
@@ -3761,9 +3406,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			list<stAlliance>::iterator iter;
 			if (pagesize <= 0 || pagesize > 20 || pageno < 0 || pageno > 100000)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invalid data.";
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("rank.getAllianceRank", -99, "Invalid data."));
 				UNLOCK(M_RANKEDLIST);
 				return;
 			}
@@ -3776,9 +3419,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if ((pageno-1)*pagesize > ranklist->size())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invalid page.";
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("rank.getAllianceRank", -99, "Invalid page."));
 				UNLOCK(M_RANKEDLIST);
 				return;
 			}
@@ -3848,9 +3489,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			list<stHeroRank>::iterator iter;
 			if (pagesize <= 0 || pagesize > 20 || pageno < 0 || pageno > 100000)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invalid data.";
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("rank.getHeroRank", -99, "Invalid data."));
 				UNLOCK(M_RANKEDLIST);
 				return;
 			}
@@ -3863,9 +3502,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if ((pageno-1)*pagesize > ranklist->size())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invalid page.";
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("rank.getHeroRank", -99, "Invalid page."));
 				UNLOCK(M_RANKEDLIST);
 				return;
 			}
@@ -3927,9 +3564,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			list<stCastleRank>::iterator iter;
 			if (pagesize <= 0 || pagesize > 20 || pageno < 0 || pageno > 100000)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invalid data.";
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("rank.getCastleRank", -99, "Invalid data."));
 				UNLOCK(M_RANKEDLIST);
 				return;
 			}
@@ -3942,9 +3577,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if ((pageno-1)*pagesize > ranklist->size())
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invalid page.";
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("rank.getCastleRank", -99, "Invalid page."));
 				UNLOCK(M_RANKEDLIST);
 				return;
 			}
@@ -3989,12 +3622,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (restype < 0 || restype > 3)
 			{
-				obj2["cmd"] = "trade.searchTrades";
-				data2["packageId"] = 0.0f;
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not a valid resource type.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("trade.searchTrades", -99, "Not a valid resource type."));
 				return;
 			}
 
@@ -4022,12 +3650,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				{
 					if (client->m_cents < gserver->m_items[i].cost*amount)
 					{
-						obj2["cmd"] = "shop.buy";
-						data2["packageId"] = 0.0f;
-						data2["ok"] = -28;
-						data2["errorMsg"] = "Insufficient game coins.";
-
-						gserver->SendObject(c, obj2);
+						gserver->SendObject(c, gserver->CreateError("shop.buy", -28, "Insufficient game coins."));
 						return;
 					}
 					client->m_cents -= gserver->m_items[i].cost*amount;
@@ -4044,12 +3667,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					return;
 				}
 			}
-			obj2["cmd"] = "shop.buy";
-			data2["packageId"] = 0.0f;
-			data2["ok"] = -99;
-			data2["errorMsg"] = "Item does not exist.";
-
-			gserver->SendObject(c, obj2);
+			gserver->SendObject(c, gserver->CreateError("shop.buy", -99, "Item does not exist."));
 			return;
 		}
 		if ((command == "getBuyResourceInfo"))
@@ -4092,13 +3710,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (fooduse + wooduse + stoneuse + ironuse > client->m_cents)
 			{
-				obj2["cmd"] = "shop.buyResource";
-				data2["packageId"] = 0.0f;
-				data2["ok"] = -24;
-				data2["errorMsg"] = "Insufficient game coins.";
-
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("shop.buyResource", -24, "Insufficient game coins."));
 				return;
 			}
 
@@ -4128,13 +3740,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (client->GetItemCount(itemid) < num)
 			{
-				obj2["cmd"] = "shop.useGoods";
-				data2["packageId"] = 0.0f;
-				data2["ok"] = -24;
-				data2["errorMsg"] = "Insufficient items.";
-
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("shop.useGoods", -24, "Insufficient items."));
 				return;
 			}
 			ShopUseGoods(data, client);
@@ -4316,11 +3922,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				|| (res.iron > pcity->m_resources.iron)
 				|| (res.gold > pcity->m_resources.gold))
 			{
-				data2["ok"] = -1;
-				data2["errorMsg"] = "Not enough resources.";
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("fortifications.produceWallProtect", -1, "Not enough resources."));
 				return;
 			}
 
@@ -4329,11 +3931,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (pcity->AddToBarracksQueue(-2, trooptype, num, false, false) == -1)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Troops could not be trained.";
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("fortifications.produceWallProtect", -99, "Troops could not be trained."));
 				return;
 			}
 
@@ -4600,21 +4198,13 @@ void request_handler::handle_request(const request& req, reply& rep)
 				|| (res.iron > pcity->m_resources.iron)
 				|| (res.gold > pcity->m_resources.gold))
 			{
-				data2["ok"] = -1;
-				data2["errorMsg"] = "Not enough resources.";
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("troop.produceTroop", -1, "Not enough resources."));
 				return;
 			}
 
 			if (isshare || toidle)
 			{
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not supported action.";
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("troop.produceTroop", -99, "Not supported action."));
 				return;
 			}
 
@@ -4625,11 +4215,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			if (pcity->AddToBarracksQueue(positionid, trooptype, num, isshare, toidle) == -1)
 			{
 				UNLOCK(M_TIMEDLIST);
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Troops could not be trained.";
-				data2["packageId"] = 0.0f;
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("troop.produceTroop", -99, "Troops could not be trained."));
 				return;
 			}
 			UNLOCK(M_TIMEDLIST);
@@ -4744,11 +4330,6 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (timestamp - pcity->m_lastcomfort < 15*60*1000)
 			{
-				obj2["cmd"] = "interior.pacifyPeople";
-				data2["packageId"] = 0.0f;
-				data2["ok"] = -34;
-				string str = "";
-
 				{
 					stringstream ss;
 					double timediff = pcity->m_lastcomfort + 15*60*1000 - timestamp;
@@ -4757,12 +4338,8 @@ void request_handler::handle_request(const request& req, reply& rep)
 					ss << min << "m ";
 					ss << sec << "s ";
 					ss << "interval needed for next comforting.";
-					str = ss.str();
+					gserver->SendObject(c, gserver->CreateError("interior.pacifyPeople", -34, ss.str()));
 				}
-
-				data2["errorMsg"] = (char*)str.c_str();
-
-				gserver->SendObject(c, obj2);
 				return;
 			}
 
@@ -4778,9 +4355,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				case 1://Disaster Relief 100% pop limit in food for cost, increases loyalty by 5 reduces grievance by 15
 					if (pcity->m_resources.food < pcity->m_maxpopulation)
 					{
-						data2["errorMsg"] = "Not enough food.";
-
-						gserver->SendObject(c, obj2);
+						gserver->SendObject(c, gserver->CreateError("interior.pacifyPeople", -99, "Not enough food."));
 						return;
 					}
 					pcity->m_resources.food -= pcity->m_maxpopulation;
@@ -4796,9 +4371,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				case 2://Praying 100% pop limit in food for cost, increases loyalty by 25 reduces grievance by 5
 					if (pcity->m_resources.food < pcity->m_maxpopulation)
 					{
-						data2["errorMsg"] = "Not enough food.";
-
-						gserver->SendObject(c, obj2);
+						gserver->SendObject(c, gserver->CreateError("interior.pacifyPeople", -99, "Not enough food."));
 						return;
 					}
 					pcity->m_resources.food -= pcity->m_maxpopulation;
@@ -4814,9 +4387,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				case 3://Blessing 10% pop limit in gold for cost, increases food by 100% pop limit - chance for escaping disaster?
 					if (pcity->m_resources.gold < (pcity->m_maxpopulation/10))
 					{
-						data2["errorMsg"] = "Not enough gold.";
-
-						gserver->SendObject(c, obj2);
+						gserver->SendObject(c, gserver->CreateError("interior.pacifyPeople", -99, "Not enough gold."));
 						return;
 					}
 					pcity->m_resources.gold -= (pcity->m_maxpopulation/10);
@@ -4824,9 +4395,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					if (rand()%10 == 1)
 					{
 						pcity->m_resources.food += pcity->m_maxpopulation;
-						data2["errorMsg"] = "Free blessing!";
-
-						gserver->SendObject(c, obj2);
+						gserver->SendObject(c, gserver->CreateError("interior.pacifyPeople", -99, "Free blessing!"));
 
 						pcity->ResourceUpdate();
 						client->PlayerUpdate();
@@ -4838,9 +4407,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				case 4://Population Raising 500% pop limit in food for cost, increases population by 5%
 					if (pcity->m_resources.food < (pcity->m_maxpopulation*5))
 					{
-						data2["errorMsg"] = "Not enough food.";
-
-						gserver->SendObject(c, obj2);
+						gserver->SendObject(c, gserver->CreateError("interior.pacifyPeople", -99, "Not enough food."));
 						return;
 					}
 					pcity->m_resources.food -= (pcity->m_maxpopulation*5);
@@ -4869,11 +4436,6 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (timestamp - pcity->m_lastlevy < 15*60*1000)
 			{
-				obj2["cmd"] = "interior.taxation";
-				data2["packageId"] = 0.0f;
-				data2["ok"] = -34;
-				string str = "";
-
 				{
 					stringstream ss;
 					double timediff = pcity->m_lastlevy + 15*60*1000 - timestamp;
@@ -4882,12 +4444,8 @@ void request_handler::handle_request(const request& req, reply& rep)
 					ss << min << "m ";
 					ss << sec << "s ";
 					ss << "interval needed for next levy.";
-					str = ss.str();
+					gserver->SendObject(c, gserver->CreateError("interior.taxation", -34, ss.str()));
 				}
-
-				data2["errorMsg"] = (char*)str.c_str();
-
-				gserver->SendObject(c, obj2);
 				return;
 			}
 
@@ -4900,9 +4458,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (pcity->m_loyalty <= 20) //not enough loyalty to levy
 			{
-				data2["errorMsg"] = "Loyalty too low. Please comfort first.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("interior.taxation", -99, "Loyalty too low. Please comfort first."));
 				return;
 			}
 			pcity->m_loyalty -= 20;
@@ -5076,12 +4632,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (blevel <= pcity->HeroCount())
 			{
-				obj2["cmd"] = "hero.hireHero";
-				data2["ok"] = -99;
-				data2["packageId"] = 0.0f;
-				data2["errorMsg"] = "Insufficient vacancies in Feasting Hall.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("hero.hireHero", -99, "Insufficient vacancies in Feasting Hall."));
 				return;
 			}
 
@@ -5092,12 +4643,8 @@ void request_handler::handle_request(const request& req, reply& rep)
 					int32_t hirecost = pcity->m_innheroes[i]->m_level * 1000;
 					if (hirecost > pcity->m_resources.gold)
 					{
-						obj2["cmd"] = "hero.hireHero";
-						data2["ok"] = -99;// TODO Get proper not enough gold to hire error code - hero.hireHero
-						data2["packageId"] = 0.0f;
-						data2["errorMsg"] = "Not enough gold!";
-
-						gserver->SendObject(c, obj2);
+						// TODO Get proper not enough gold to hire error code - hero.hireHero
+						gserver->SendObject(c, gserver->CreateError("hero.hireHero", -99, "Not enough gold!"));
 						return;
 					}
 
@@ -5128,12 +4675,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					return;
 				}
 			}
-			obj2["cmd"] = "hero.hireHero";
-			data2["ok"] = -99;
-			data2["packageId"] = 0.0f;
-			data2["errorMsg"] = "Hero does not exist!";
-
-			gserver->SendObject(c, obj2);
+			gserver->SendObject(c, gserver->CreateError("hero.hireHero", -99, "Hero does not exist!"));
 			return;
 		}
 		if ((command == "fireHero"))
@@ -5149,12 +4691,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				{
 					if (pcity->m_heroes[i]->m_status != 0)
 					{
-						obj2["cmd"] = "hero.fireHero";
-						data2["ok"] = -80;
-						data2["packageId"] = 0.0f;
-						data2["errorMsg"] = "Status of this hero is not Idle!";
-
-						gserver->SendObject(c, obj2);
+						gserver->SendObject(c, gserver->CreateError("hero.fireHero", -80, "Status of this hero is not Idle!"));
 						return;
 					}
 					pcity->CalculateResourceStats();
@@ -5180,12 +4717,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				}
 			}
 
-			obj2["cmd"] = "hero.fireHero";
-			data2["ok"] = -99;
-			data2["packageId"] = 0.0f;
-			data2["errorMsg"] = "Hero does not exist!";
-
-			gserver->SendObject(c, obj2);
+			gserver->SendObject(c, gserver->CreateError("hero.fireHero", -99, "Hero does not exist!"));
 			return;
 		}
 		if ((command == "promoteToChief"))
@@ -5220,12 +4752,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					return;
 				}
 			}
-			obj2["cmd"] = "hero.promoteToChief";
-			data2["ok"] = -99;
-			data2["packageId"] = 0.0f;
-			data2["errorMsg"] = "TODO error message - hero.promoteToChief";
-
-			gserver->SendObject(c, obj2);
+			gserver->SendObject(c, gserver->CreateError("hero.promoteToChief", -99, "TODO error message - hero.promoteToChief"));
 			return;
 			// TODO needs an error message - hero.promoteToChief
 		}
@@ -5236,12 +4763,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (!pcity->m_mayor)
 			{
-				obj2["cmd"] = "hero.dischargeChief";
-				data2["ok"] = -99;
-				data2["packageId"] = 0.0f;
-				data2["errorMsg"] = "Castellan is not appointed yet.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("hero.dischargeChief", -99, "Castellan is not appointed yet."));
 				return;
 			}
 
@@ -5277,12 +4799,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				{
 					if (pcity->m_heroes[i]->m_status > 1)
 					{
-						obj2["cmd"] = "hero.resetPoint";
-						data2["ok"] = -80;
-						data2["packageId"] = 0.0f;
-						data2["errorMsg"] = "Status of this hero is not Idle!";
-
-						gserver->SendObject(c, obj2);
+						gserver->SendObject(c, gserver->CreateError("hero.resetPoint", -80, "Status of this hero is not Idle!"));
 						return;
 					}
 					pcity->CalculateResourceStats();
@@ -5309,12 +4826,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				}
 			}
 
-			obj2["cmd"] = "hero.resetPoint";
-			data2["ok"] = -99;
-			data2["packageId"] = 0.0f;
-			data2["errorMsg"] = "Hero does not exist!";
-
-			gserver->SendObject(c, obj2);
+			gserver->SendObject(c, gserver->CreateError("hero.resetPoint", -99, "Hero does not exist!"));
 			return;
 		}
 		if ((command == "addPoint"))
@@ -5342,12 +4854,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					if (((stratagem + power + management) > (hero->m_basemanagement + hero->m_basepower + hero->m_basestratagem + hero->m_level))
 						|| (stratagem < hero->m_stratagem) || (power < hero->m_power) || (management < hero->m_management))
 					{
-						obj2["cmd"] = "hero.resetPoint";
-						data2["ok"] = -99;
-						data2["packageId"] = 0.0f;
-						data2["errorMsg"] = "Invalid action.";
-
-						gserver->SendObject(c, obj2);
+						gserver->SendObject(c, gserver->CreateError("hero.addPoint", -99, "Invalid action."));
 						return;
 					}
 					hero->m_power = power;
@@ -5369,12 +4876,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				}
 			}
 
-			obj2["cmd"] = "hero.resetPoint";
-			data2["ok"] = -99;
-			data2["packageId"] = 0.0f;
-			data2["errorMsg"] = "Hero does not exist!";
-
-			gserver->SendObject(c, obj2);
+			gserver->SendObject(c, gserver->CreateError("hero.addPoint", -99, "Hero does not exist!"));
 			return;
 		}
 		if ((command == "levelUp"))
@@ -5394,10 +4896,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					Hero * hero = pcity->m_heroes[i];
 					if (hero->m_experience < hero->m_upgradeexp)
 					{
-						data2["ok"] = -99;
-						data2["errorMsg"] = "Not enough experience.";
-
-						gserver->SendObject(c, obj2);
+						gserver->SendObject(c, gserver->CreateError("hero.levelUp", -99, "Not enough experience."));
 						return;
 					}
 
@@ -5417,10 +4916,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				}
 			}
 
-			data2["ok"] = -99;
-			data2["errorMsg"] = "Hero does not exist!";
-
-			gserver->SendObject(c, obj2);
+			gserver->SendObject(c, gserver->CreateError("hero.levelUp", -99, "Hero does not exist!"));
 			return;
 		}
 		if ((command == "refreshHerosListFromTavern"))
@@ -5461,12 +4957,8 @@ void request_handler::handle_request(const request& req, reply& rep)
 			}
 			else
 			{
-				obj2["cmd"] = "hero.refreshHerosListFromTavern";
-				data2["ok"] = -99; // TODO find error (not enough cents) - hero.refreshHerosListFromTavern
-				data2["packageId"] = 0.0f;
-				data2["errorMsg"] = "Not enough cents.";
-
-				gserver->SendObject(c, obj2);
+				// TODO find error (not enough cents) - hero.refreshHerosListFromTavern
+				gserver->SendObject(c, gserver->CreateError("hero.refreshHerosListFromTavern", -99, "Not enough cents."));
 			}
 
 			return;
@@ -5525,12 +5017,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (client->m_password != pass)
 			{
-				obj2["cmd"] = "city.setStopWarState";
-				data2["packageId"] = 0.0f;
-				data2["ok"] = -50;
-				data2["errorMsg"] = "Incorrect account or password.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("city.setStopWarState", -50, "Incorrect account or password."));
 				return;
 			}
 
@@ -5544,12 +5031,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				int32_t cost = gserver->GetItem(itemid)->cost;
 				if (client->m_cents < cost)
 				{
-					obj2["cmd"] = "city.setStopWarState";
-					data2["packageId"] = 0.0f;
-					data2["ok"] = -99;
-					data2["errorMsg"] = "Not enough cents.";
-
-					gserver->SendObject(c, obj2);
+					gserver->SendObject(c, gserver->CreateError("city.setStopWarState", -99, "Not enough cents."));
 					return;
 				}
 				client->m_cents -= cost;
@@ -5560,10 +5042,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			}
 			else
 			{
-				obj2["cmd"] = "city.setStopWarState";
-				data2["packageId"] = 0.0f;
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Invalid state.";
+				gserver->SendObject(c, gserver->CreateError("city.setStopWarState", -99, "Invalid state."));
 
 				gserver->SendObject(c, obj2);
 				return;
@@ -5590,23 +5069,13 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 			if (client->m_password != password)
 			{
-				obj2["cmd"] = "furlough.isFurlought";
-				data2["packageId"] = 0.0f;
-				data2["ok"] = -50;
-				data2["errorMsg"] = "Incorrect account or password.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("furlough.isFurlought", -50, "Incorrect account or password."));
 				return;
 			}
 
 			if (client->m_cents < day*10)
 			{
-				obj2["cmd"] = "furlough.isFurlought";
-				data2["packageId"] = 0.0f;
-				data2["ok"] = -99;
-				data2["errorMsg"] = "Not enough cents.";
-
-				gserver->SendObject(c, obj2);
+				gserver->SendObject(c, gserver->CreateError("furlough.isFurlought", -99, "Not enough cents."));
 				return;
 			}
 			client->m_cents -= day*10;
@@ -5864,17 +5333,9 @@ void request_handler::handle_request(const request& req, reply& rep)
 		string username = data["user"];
 		string password = data["pwd"];
 
-		if (gserver->maxplayers<= gserver->currentplayersonline+1)
+		if (gserver->maxplayers <= gserver->currentplayersonline+1)
 		{
-			amf3object obj;
-			obj["cmd"] = "server.LoginResponse";
-			obj["data"] = amf3object();
-			amf3object & data = obj["data"];
-			data["packageId"] = 0.0f;
-			data["ok"] = -99;
-			data["errorMsg"] = "Servers are currently overloaded. Please try again later.";
-
-			rep.objects.push_back(obj);
+			gserver->SendObject(c, gserver->CreateError("server.LoginResponse", -99, "Servers are currently overloaded. Please try again later."));
 			return;
 		}
 
@@ -5917,15 +5378,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 			if (rs.rowCount() == 0)
 			{
 				//account doesn't exist or password is wrong
-				amf3object obj;
-				obj["cmd"] = "server.LoginResponse";
-				obj["data"] = amf3object();
-				amf3object & data = obj["data"];
-				data["packageId"] = 0.0f;
-				data["ok"] = -2;
-				data["errorMsg"] = "Incorrect account or password.";
-
-				rep.objects.push_back(obj);
+				rep.objects.push_back(gserver->CreateError("server.LoginResponse", -2, "Incorrect account or password."));
 				return;
 			}
 			else
@@ -5951,17 +5404,11 @@ void request_handler::handle_request(const request& req, reply& rep)
 
 					if (banned)
 					{
-						amf3object obj;
-						obj["cmd"] = "server.LoginResponse";
-						obj["data"] = amf3object();
-						amf3object & data = obj["data"];
-						data["packageId"] = 0.0f;
-						data["ok"] = -99;
 						string errormsg = "You are banned. Reason: ";
 						errormsg += rs.value("reason").convert<string>().length()>0?rs.value("reason").convert<string>():rs2.value("reason").convert<string>();
-						data["errorMsg"] = errormsg.c_str();
 
-						rep.objects.push_back(obj);
+						rep.objects.push_back(gserver->CreateError("server.LoginResponse", -99, errormsg));
+
 						return;
 					}
 				}
@@ -6012,17 +5459,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				{
 					//error creating client object
 					gserver->consoleLogger->information(Poco::format("Error creating client object @ %s:%?d", (string)__FILE__, __LINE__));
-					amf3object obj;
-					obj["cmd"] = "server.LoginResponse";
-					obj["data"] = amf3object();
-					amf3object & data = obj["data"];
-					data["packageId"] = 0.0f;
-					data["ok"] = -99;
-					data["errorMsg"] = "Error with connecting. Please contact support.";
-
-					rep.objects.push_back(obj);
-					//SendObject(*req.connection, obj);
-					//req.connection->stop();
+					rep.objects.push_back(gserver->CreateError("server.LoginResponse", -99, "Error with connecting. Please contact support."));
 					return;
 				}
 
@@ -6037,16 +5474,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 				if (rs2.rowCount() == 0)
 				{
 					//does not have an account on server
-					amf3object obj;
-					obj["cmd"] = "server.LoginResponse";
-					obj["data"] = amf3object();
-					amf3object & data = obj["data"];
-					data["packageId"] = 0.0f;
-					data["ok"] = -4;
-					data["errorMsg"] = "need create player";
-
-					rep.objects.push_back(obj);
-					//SendObject(*req.connection, obj);
+					rep.objects.push_back(gserver->CreateError("server.LoginResponse", -4, "need create player"));
 					client->m_loggedin = true;
 
 					return;
@@ -6066,16 +5494,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					if (rs3.rowCount() == 0)
 					{
 						//does not have any cities on server but did have an account - this only happens if you try to "restart" your account. it saves the account info while deleting your cities
-						amf3object obj;
-						obj["cmd"] = "server.LoginResponse";
-						obj["data"] = amf3object();
-						amf3object & data = obj["data"];
-						data["packageId"] = 0.0f;
-						data["ok"] = -4;
-						data["errorMsg"] = "need create player";
-
-						rep.objects.push_back(obj);
-						//SendObject(*req.connection, obj);
+						rep.objects.push_back(gserver->CreateError("server.LoginResponse", -4, "need create player"));
 						client->m_loggedin = true;
 						return;
 					}
@@ -6102,15 +5521,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 						{
 							//problem
 							gserver->consoleLogger->error(Poco::format("Error client has no cities @ %s:%?d", (string)__FILE__, __LINE__ ));
-							amf3object obj;
-							obj["cmd"] = "server.LoginResponse";
-							obj["data"] = amf3object();
-							amf3object & data = obj["data"];
-							data["packageId"] = 0.0f;
-							data["ok"] = -99;
-							data["errorMsg"] = "Error with connecting. Please contact support.";
-
-							rep.objects.push_back(obj);
+							rep.objects.push_back(gserver->CreateError("server.LoginResponse", -99, "Error with connecting. Please contact support."));
 							return;
 						}
 						client->m_currentcityid = ((PlayerCity*)client->m_city.at(0))->m_castleid;
