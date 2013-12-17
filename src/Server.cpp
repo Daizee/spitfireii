@@ -198,7 +198,6 @@ void Server::run()
 
 	consoleLogger->information("Loading configurations.");
 
-
 	Session ses(accountpool->get());
 
 	{
@@ -1029,19 +1028,19 @@ bool Server::Init()
 
 	//main table name
 	{
-		lua_getfield(L, -1, "sqlhost");
+		lua_getfield(L, -1, "dbmaintable");
 		temp = (char*)lua_tostring(L, -1);
-		if (temp == 0) { consoleLogger->information("Invalid sqlhost setting."); return false; }
-		sqlhost = temp;
+		if (temp == 0) { consoleLogger->information("Invalid dbmaintable setting."); return false; }
+		dbmaintable = temp;
 		lua_pop(L, 1);
 	}
 
 	//server table name
 	{
-		lua_getfield(L, -1, "sqlhost");
+		lua_getfield(L, -1, "dbservertable");
 		temp = (char*)lua_tostring(L, -1);
-		if (temp == 0) { consoleLogger->information("Invalid sqlhost setting."); return false; }
-		sqlhost = temp;
+		if (temp == 0) { consoleLogger->information("Invalid dbservertable setting."); return false; }
+		dbservertable = temp;
 		lua_pop(L, 1);
 	}
 
@@ -1200,7 +1199,7 @@ void Server::TimerThread()
 					{
 						PlayerCity * city = client->m_city[j];
 						vector<stTroopQueue>::iterator tqiter;
-						for (tqiter = client->m_city[j]->m_troopqueue.begin(); tqiter != client->m_city[j]->m_troopqueue.end(); )
+						for (tqiter = city->m_troopqueue.begin(); tqiter != city->m_troopqueue.end(); )
 						{
 							list<stTroopTrain>::iterator iter;
 							iter = tqiter->queue.begin();
