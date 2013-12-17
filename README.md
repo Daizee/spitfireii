@@ -10,3 +10,4 @@ Use the project files for Visual Studio 2012 located in the root directory.
 - [Boost](http://www.boost.org/)
 - [MySQL](http://www.mysql.com/)
 - [Poco](http://pocoproject.org/)
+- [Lua](http://www.lua.org)

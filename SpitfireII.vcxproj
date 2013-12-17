@@ -214,7 +214,9 @@
     <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="bin\itemxml.xml" />
+    <Xml Include="bin\itemxml.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\config.lua" />

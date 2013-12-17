@@ -134,34 +134,42 @@ public:
 	request_handler request_handler_;
 
 
+	// MySQL
 	string sqlhost, sqluser, sqlpass, bindaddress, bindport;
-
 	string dbmaintable;
 	string dbservertable;
 
 	uint32_t serverstatus;
 
+	// Map size -- typically 500x500 or 800x800
 	uint16_t mapsize;
 
-
-
+	// Console and File log formatting
 	FormattingChannel* pFCConsole;
 	FormattingChannel* pFCFile;
 
+	// Console and File log handles
 	Logger * consoleLogger;
 	Logger * fileLogger;
 
+	// MySQL connection pools
 	SessionPool * accountpool;
 	SessionPool * serverpool;
 
 
-	//Lua
+	// Lua Handle
 	lua_State *L;
 
+	// Initialize Server
 	bool Init();
 
-	uint32_t maxplayers, currentplayersonline;
+	// Max players allowed connected
+	uint32_t maxplayers;
 
+	// Current players connected
+	uint32_t currentplayersonline;
+
+	// Whether the timer thread is running or not
 	bool TimerThreadRunning;
 
 	void TimerThread();
@@ -190,35 +198,6 @@ public:
 
 	bool savethreadrunning;
 	sockets * skts;
-
-// 	void SendObject(uint32_t s, amf3object & object)
-// 	{
-// 		try
-// 		{
-// 			if (serverstatus == 0)
-// 				return;
-// 			if ((s == 0) || (m_clients[s]))
-// 				return;
-// 			char buffer[15000];
-// 			int length = 0;
-// 			amf3writer * writer;
-// 
-// 			writer = new amf3writer(buffer+4);
-// 
-// 			writer->Write(object);
-// 
-// 			(*(int*)buffer) = length = writer->position;
-// 			ByteSwap(*(int*)buffer);
-// 
-// 			//m_clients[s]->socket->write(buffer, length+4);
-// 			delete writer;
-// 		}
-// 		catch (std::exception& e)
-// 		{
-// 			std::cerr << "exception: " << __FILE__ << " @ " << __LINE__ << "\n";
-// 			std::cerr << e.what() << "\n";
-// 		}
-// 	}
 
 	void SendObject(connection * s, amf3object & object)
 	{
@@ -253,11 +232,16 @@ public:
 		}
 	}
 
-	vector<City*> m_city;// npc cities
+	// List of active cities on the server (NPC and Player)
+	vector<City*> m_city;
+
+	// Alliance Controller
 	AllianceCore * m_alliances;
 
+	// Parse chat for commands
 	bool ParseChat(Client * client, char * str);
 
+	// Get Alliance based relation between two clients
 	int16_t GetRelation(int32_t client1, int32_t client2);
 
 	uint64_t ltime;
@@ -360,12 +344,27 @@ public:
 	void CheckRankSearchTimeouts(uint64_t time);
 
 
+	// Construct an error message to send to the client
 	amf3object CreateError(string cmd, int32_t id, string message)
 	{
 		amf3object obj;
 		obj["cmd"] = cmd;
 		obj["data"] = amf3object();
 		amf3object & data = obj["data"];
+		data["errorMsg"] = message;
+		data["packageId"] = 0.0f;
+		data["ok"] = id;
+		return obj;
+	}
+	// Construct an error message to send to the client
+	// tested and functioning 
+	// gserver->SendObject(&c, *gserver->CreateError2("error.error", -1, "message").get());
+	shared_ptr<amf3object> CreateError2(string cmd, int32_t id, string message)
+	{
+		shared_ptr<amf3object> obj(new amf3object);
+		obj->operator[]("cmd") = cmd;
+		obj->operator[]("data") = amf3object();
+		amf3object & data = obj->operator[]("data");
 		data["errorMsg"] = message;
 		data["packageId"] = 0.0f;
 		data["ok"] = id;

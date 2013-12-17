@@ -5678,6 +5678,9 @@ void request_handler::handle_request(const request& req, reply& rep)
 			VERIFYCASTLEID();
 			CHECKCASTLEID();
 
+			//TODO: should set a mutex up to prevent the possibility of multiple threads trying to start new armies effectively duplicating troops
+			//or causing troop number errors
+
 			amf3object & armybean = data["newArmyBean"];
 			uint32_t castleid = data["castleId"];
 			int32_t targettile = armybean["targetPoint"];
@@ -5732,14 +5735,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 					if (oclient == 0)
 					{
 						//error occurred
-						amf3object obj3;
-						obj3["cmd"] = "army.newArmy";
-						obj3["data"] = amf3object();
-						amf3object & data3 = obj3["data"];
-						data3["errorMsg"] = "Problem with internal mapdata. Please report this bug.";
-						data3["packageId"] = 0.0f;
-						data3["ok"] = -13;
-						rep.objects.push_back(obj3);
+						rep.objects.push_back(gserver->CreateError("army.newArmy", -13, "Problem with internal mapdata. Please report this bug."));
 						return;
 					}
 					//TODO: this will need changed for Age2 support (individual war status) (army.newArmy alliance checking)
@@ -5812,7 +5808,13 @@ void request_handler::handle_request(const request& req, reply& rep)
 					pcity->ResourceUpdate();
 					client->UpdateSelfArmy();
 				}
+				else
+				{
+					//NPC owned
+				}
 			}
+
+			return;
 
 
 

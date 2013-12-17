@@ -86,40 +86,16 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 	catch (std::exception& e)
 	{
-		gserver->consoleLogger->information(Poco::format("Init Exception: %s", (string)e.what()));
+		gserver->consoleLogger->fatal(Poco::format("Init() Exception: %s", (string)e.what()));
 		system("pause");
 		return 0;
 	}
 	catch(...)
 	{
-		gserver->consoleLogger->information("Init Exception.");
+		gserver->consoleLogger->fatal("Unspecified Init() Exception.");
 		system("pause");
 		return 0;
 	}
-
-// 	    /*
-//     The MySQL Connector/C++ throws three different exceptions:
-// 
-//     - sql::MethodNotImplementedException (derived from sql::SQLException)
-//     - sql::InvalidArgumentException (derived from sql::SQLException)
-//     - sql::SQLException (derived from std::runtime_error)
-//     */
-//     cout << "# ERR: SQLException in " << __FILE__;
-//     cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
-//     // Use what(), getErrorCode() and getSQLState()
-//     cout << "# ERR: " << e.what();
-//     cout << " (MySQL error code: " << e.getErrorCode();
-//     cout << ", SQLState: " << e.getSQLState() << " )" << endl;
-//     cout << "not ok 1 - examples/statement.cpp" << endl;
-// 
-
-// 	ResultSet * res = gserver->sql1->QueryRes("SELECT * from account");
-// 	cout << res->rowsCount() << endl;
-// 	while (res->next()) {
-// 		cout << "password = " << res->getString("password") << endl; // getInt(1) returns the first column
-// 	}
-
-
 
 	//Server is finally online here
 	gserver->serverstatus = SERVERSTATUS_ONLINE;
@@ -130,25 +106,29 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		gserver->run();
 	}
-	catch (Poco::Data::MySQL::StatementException * e)
+	catch (Poco::Data::MySQL::MySQLException * e)
 	{
-		gserver->consoleLogger->error(Poco::format("Random SQL Exception: %s", e->displayText() ));
-	}
-
-	while (gserver->TimerThreadRunning)
-	{
-		Sleep(1);
+		gserver->consoleLogger->fatal(Poco::format("SQL Exception: %s", e->displayText() ));
 	}
 
 
-	//ResultSet * res = server->GetAccountSQL()->QueryRes("SELECT * from account");
-	//while (res->next()) {
-	//	cout << "password = " << res->getString("password") << endl; // getInt(1) returns the first column
-	//}
+	try 
+	{
+		gserver->TimerThread();
+	}
+	catch (Poco::Data::MySQL::MySQLException * e)
+	{
+		gserver->consoleLogger->fatal(Poco::format("TimerThread() SQL Exception: %s", e->displayText() ));
+	}
+	catch (...)
+	{
+		gserver->consoleLogger->fatal("Unspecified TimerThread() Exception.");
+	}
 
 
-	//gserver->ConLog()->Log("Shutting down");
+	gserver->consoleLogger->information("Shutting down");
 
+	//does this need a thread join here?
 
 	gserver->stop_all();
 	delete gserver;
